@@ -1,3 +1,3 @@
 <template>
-  <div>Item One</div>
+  <div text-indigo>Item One</div>
 </template>
