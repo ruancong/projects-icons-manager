@@ -38,4 +38,11 @@ export default defineConfig({
   ],
   transformers: [transformerDirectives(), transformerVariantGroup()],
   safelist: 'prose prose-sm m-auto text-left'.split(' '),
+  theme: {
+    animation: {
+      durations: {
+        bounce: '0.5s',
+      },
+    },
+  },
 });
