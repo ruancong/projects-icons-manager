@@ -21,7 +21,6 @@ import { createApp } from 'vue';
 import { createRouter } from 'vue-router';
 import { createWebHistory } from 'vue-router';
 
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 
 const app = createApp(App);
 app.use(
@@ -30,7 +29,5 @@ app.use(
     routes,
   }),
 );
-app.use(ElementPlus, {
-  locale: zhCn,
-});
+app.use(ElementPlus);
 app.mount('#app');
