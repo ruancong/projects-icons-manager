@@ -8,8 +8,8 @@ import { toggleDark } from '~/composables';
   <el-menu class="el-menu-demo" mode="horizontal" :ellipsis="false" router>
     <el-menu-item index="/">
       <div class="flex items-center justify-center gap-2">
-        <div class="text-xl" i-ep-element-plus />
-        <span>Element Plus</span>
+        <div class="text-xl text-green-500" i-ri-apple-fill />
+        <span>Project Icon Management</span>
       </div>
     </el-menu-item>
     <el-sub-menu index="2">
