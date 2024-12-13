@@ -62,12 +62,58 @@
       >
       </el-pagination>
     </div>
+
+    <!-- 在原有代码最后添加弹窗组件 -->
+    <el-dialog
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      width="500px"
+      :close-on-click-modal="false"
+      :before-close="handleDialogClose"
+    >
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="80px"
+        label-position="right"
+      >
+        <el-form-item label="项目名称" prop="name">
+          <el-input v-model="formData.name" placeholder="请输入项目名称" />
+        </el-form-item>
+        <el-form-item label="项目状态" prop="status">
+          <el-select v-model="formData.status" placeholder="请选择状态" class="w-full">
+            <el-option label="进行中" value="1" />
+            <el-option label="已完成" value="2" />
+            <el-option label="已暂停" value="3" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="时间区间" prop="dateRange">
+          <el-date-picker
+            v-model="formData.dateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="YYYY-MM-DD"
+            class="w-full"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="handleDialogClose">取消</el-button>
+          <el-button type="primary" @click="handleSubmit">确定</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import type { FormInstance, FormRules } from 'element-plus';
 
 // 定义接口
 interface SearchFormState {
@@ -81,6 +127,13 @@ interface ProjectItem {
   status: string;
   startDate: string;
   endDate: string;
+}
+
+// 在接口定义区域添加 FormData 接口
+interface FormData {
+  name: string;
+  status: string;
+  dateRange: [Date, Date] | undefined;
 }
 
 // 搜索表单数据
@@ -171,7 +224,16 @@ const handleCurrentChange = (val: number): void => {
 
 // 新增项目
 const handleAdd = (): void => {
-  ElMessage.info('点击了新增按钮');
+  dialogVisible.value = true;
+  dialogTitle.value = '新增项目';
+  // 重置表单数据
+  formData.name = '';
+  formData.status = '';
+  formData.dateRange = undefined;
+  // 重置表单验证
+  nextTick(() => {
+    formRef.value?.resetFields();
+  });
 };
 
 // 编辑项目
@@ -199,6 +261,55 @@ const handleDelete = (row: ProjectItem): void => {
 onMounted(() => {
   fetchData();
 });
+
+// 在原有的响应式数据后添加
+const dialogVisible = ref(false);
+const dialogTitle = ref('新增项目');
+const formRef = ref<FormInstance>();
+const formData = reactive<FormData>({
+  name: '',
+  status: '',
+  dateRange: undefined,
+});
+
+// 表单验证规则
+const formRules: FormRules = {
+  name: [
+    { required: true, message: '请输入项目名称', trigger: 'blur' },
+    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' },
+  ],
+  status: [{ required: true, message: '请选择项目状态', trigger: 'change' }],
+  dateRange: [{ required: true, message: '请选择时间区间', trigger: 'change' }],
+};
+
+// 添加新的处理函数
+const handleDialogClose = () => {
+  dialogVisible.value = false;
+};
+
+const handleSubmit = async () => {
+  if (!formRef.value) return;
+  
+  await formRef.value.validate((valid, fields) => {
+    if (valid) {
+      // 这里处理表单提交逻辑
+      const submitData = {
+        name: formData.name,
+        status: formData.status,
+        startDate: formData.dateRange?.[0],
+        endDate: formData.dateRange?.[1],
+      };
+      
+      console.log('提交的数据：', submitData);
+      ElMessage.success('保存成功');
+      dialogVisible.value = false;
+      // 刷新表格数据
+      fetchData();
+    } else {
+      console.error('表单验证失败:', fields);
+    }
+  });
+};
 </script>
 
 <style scoped>
@@ -221,5 +332,15 @@ onMounted(() => {
   margin-top: 20px;
   display: flex;
   justify-content: flex-end;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+:deep(.el-dialog__body) {
+  padding: 20px;
 }
 </style>
