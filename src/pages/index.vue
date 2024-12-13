@@ -1,4 +1,6 @@
 <template>
-  <Logos my="4" />
-  <HelloWorld msg="Hello Vue 3 + Element Plus + Vite" />
+  <div flex items-center justify-center>
+    <div w-10 h-10 text-xl text-green-500 i-ri-apple-fill />
+  </div>
+  <HelloWorld msg="Project Icon Manager" />
 </template>

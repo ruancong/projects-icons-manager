@@ -3,11 +3,9 @@ import { Document, Menu as IconMenu, Location, Setting } from '@element-plus/ico
 
 // const isCollapse = ref(true)
 function handleOpen(key: string, keyPath: string[]) {
-  // eslint-disable-next-line no-console
   console.log(key, keyPath);
 }
 function handleClose(key: string, keyPath: string[]) {
-  // eslint-disable-next-line no-console
   console.log(key, keyPath);
 }
 </script>
