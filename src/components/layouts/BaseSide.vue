@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Document, Menu as IconMenu, Location, Setting } from '@element-plus/icons-vue';
+import { Menu as IconMenu } from '@element-plus/icons-vue';
 
 // const isCollapse = ref(true)
 function handleOpen(key: string, keyPath: string[]) {
@@ -18,36 +18,11 @@ function handleClose(key: string, keyPath: string[]) {
     @open="handleOpen"
     @close="handleClose"
   >
-    <el-sub-menu index="44">
-      <template #title>
-        <el-icon>
-          <Location />
-        </el-icon>
-        <span>项目管理</span>
-      </template>
-      <el-menu-item index="/nav/1/item-1"> item one </el-menu-item>
-      <el-menu-item index="/nav/1/item-2"> item two </el-menu-item>
-    </el-sub-menu>
-
-    <el-menu-item index="/nav/2">
+    <el-menu-item index="/nav/project-list">
       <el-icon>
         <IconMenu />
       </el-icon>
-      <template #title> Navigator Two </template>
-    </el-menu-item>
-
-    <el-menu-item index="3" disabled>
-      <el-icon>
-        <Document />
-      </el-icon>
-      <template #title> Navigator Three </template>
-    </el-menu-item>
-
-    <el-menu-item index="/nav/4">
-      <el-icon>
-        <Setting />
-      </el-icon>
-      <template #title> Navigator Four </template>
+      <template #title>项目管理</template>
     </el-menu-item>
   </el-menu>
 </template>
