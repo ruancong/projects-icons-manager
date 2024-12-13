@@ -16,4 +16,11 @@ export default [
   ...pluginVue.configs['flat/essential'],
   ...vueTsEslintConfig(),
   skipFormatting,
+
+  {
+    rules: {
+      // 关闭多词组件名称的规则
+      'vue/multi-word-component-names': 'off'
+    }
+  },
 ]
