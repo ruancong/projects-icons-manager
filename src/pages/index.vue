@@ -4,3 +4,10 @@
   </div>
   <HelloWorld msg="Project Icon Manager" />
 </template>
+
+<script lang="ts" setup>
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+router.replace('/nav/project-list'); 
+</script>

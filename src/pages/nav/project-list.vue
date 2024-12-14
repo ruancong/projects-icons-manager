@@ -19,14 +19,15 @@
     </div>
 
     <!-- 表格区域 -->
-    <el-table v-loading="loading" :data="tableData" class="border w-full">
-      <el-table-column prop="id" label="序号" width="80" />
+    <el-table border v-loading="loading" :data="tableData" class="border w-full">
+      <el-table-column prop="id" label="序号" width="100" />
       <el-table-column prop="name" label="项目名称" />
       <el-table-column prop="rootPath" label="存储根目录" />
       <el-table-column label="操作" width="200">
         <template #default="scope">
-          <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+          <el-button size="small" type="primary" @click="handleToDetail(scope.row)"
+            >详情页</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -82,16 +83,15 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, nextTick } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
-
-// 定义接口
+import { useRouter } from 'vue-router';
 interface SearchFormState {
   name: string;
 }
 
 interface ProjectItem {
-  id: number;
+  id: string;
   name: string;
   rootPath: string;
 }
@@ -114,13 +114,15 @@ const currentPage = ref<number>(1);
 const pageSize = ref<number>(10);
 const total = ref<number>(0);
 
+const router = useRouter();
+
 // 获取表格数据
 const fetchData = async () => {
   loading.value = true;
   try {
     // 模拟数据
     const mockData: ProjectItem[] = Array.from({ length: 10 }, (_, index) => ({
-      id: index + 1,
+      id: index + 1 + '',
       name: `项目${index + 1}`,
       rootPath: `/data/projects/project${index + 1}`,
     }));
@@ -171,25 +173,9 @@ const handleAdd = (): void => {
   });
 };
 
-// 编辑项目
-const handleEdit = (row: ProjectItem): void => {
-  ElMessage.info(`点击了编辑按钮，项目ID：${row.id}`);
-};
-
-// 删除项目
-const handleDelete = (row: ProjectItem): void => {
-  ElMessageBox.confirm(`确认删除项目"${row.name}"吗？`, '警告', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  })
-    .then(() => {
-      ElMessage.success('删除成功');
-      fetchData();
-    })
-    .catch(() => {
-      ElMessage.info('已取消删除');
-    });
+// 详情页
+const handleToDetail = (row: ProjectItem): void => {
+  router.push(`/project/${row.id}`);
 };
 
 // 页面加载时获取数据
