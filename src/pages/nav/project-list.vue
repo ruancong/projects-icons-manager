@@ -87,17 +87,12 @@ import { ElMessage } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { useGlobalMessage } from '~/composables/useGlobalMessage';
-import request from '~/utils/request';
+import { ProjectVO } from '~/types/api-vo-types';
+import api from '~/api/api';
 
 // 1. 接口定义
 interface SearchFormState {
   name: string;
-}
-
-interface ProjectItem {
-  id: string;
-  name: string;
-  rootPath: string;
 }
 
 interface FormData {
@@ -116,7 +111,7 @@ const searchForm = reactive<SearchFormState>({
 
 // 表格相关
 const loading = ref<boolean>(false);
-const tableData = ref<ProjectItem[]>([]);
+const tableData = ref<ProjectVO[]>([]);
 const currentPage = ref<number>(1);
 const pageSize = ref<number>(10);
 const total = ref<number>(0);
@@ -152,13 +147,13 @@ onMounted(() => {
 const fetchData = async () => {
   loading.value = true;
   // 模拟数据
-  const mockData: ProjectItem[] = Array.from({ length: 10 }, (_, index) => ({
+  const mockData: ProjectVO[] = Array.from({ length: 10 }, (_, index) => ({
     id: index + 1 + '',
     name: `项目${index + 1}`,
     rootPath: `/data/projects/project${index + 1}`,
   }));
 
-  const res = await request.get<ProjectItem[]>('/project/list');
+  const res = await api.queryPageProjects(1, 1);
   console.log(res);
 
   tableData.value = mockData;
@@ -201,7 +196,7 @@ const handleAdd = (): void => {
   });
 };
 
-const handleToDetail = (row: ProjectItem): void => {
+const handleToDetail = (row: ProjectVO): void => {
   router.push(`/project/${row.id}`);
 };
 

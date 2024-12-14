@@ -11,3 +11,5 @@ export default function getEnv(): EnvConfig {
     MODE: import.meta.env.MODE as ModeEnum,
   };
 }
+
+export const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true'

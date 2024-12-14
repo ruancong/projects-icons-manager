@@ -3,3 +3,9 @@ export interface BaseResponse<T = unknown> {
   msg: string;
   data?: T;
 }
+
+export interface ProjectVO {
+  id: string;
+  name: string;
+  rootPath: string;
+}
