@@ -86,6 +86,7 @@ import { ref, reactive, onMounted, nextTick } from 'vue';
 import { ElMessage } from 'element-plus';
 import type { FormInstance, FormRules } from 'element-plus';
 import { useRouter } from 'vue-router';
+import { useGlobalMessage } from '~/composables/useGlobalMessage';
 interface SearchFormState {
   name: string;
 }
@@ -115,6 +116,7 @@ const pageSize = ref<number>(10);
 const total = ref<number>(0);
 
 const router = useRouter();
+const { success } = useGlobalMessage();
 
 // 获取表格数据
 const fetchData = async () => {
@@ -145,6 +147,7 @@ const handleSearch = (): void => {
 
 // 重置搜索
 const resetSearch = (): void => {
+  success('重置成功');
   searchForm.name = '';
   handleSearch();
 };
