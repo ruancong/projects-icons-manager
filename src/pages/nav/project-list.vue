@@ -6,13 +6,6 @@
         <el-form-item label="项目名称">
           <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
         </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
-            <el-option label="进行中" value="1" />
-            <el-option label="已完成" value="2" />
-            <el-option label="已暂停" value="3" />
-          </el-select>
-        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="resetSearch">重置</el-button>
@@ -29,19 +22,11 @@
     <el-table v-loading="loading" :data="tableData" border style="width: 100%">
       <el-table-column prop="id" label="序号" width="80" />
       <el-table-column prop="name" label="项目名称" />
-      <el-table-column prop="status" label="状态">
-        <template #default="scope">
-          <el-tag :type="getStatusType(scope.row.status)">
-            {{ getStatusText(scope.row.status) }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="startDate" label="开始时间" />
-      <el-table-column prop="endDate" label="结束时间" />
+      <el-table-column prop="rootPath" label="存储根目录" />
       <el-table-column label="操作" width="200">
         <template #default="scope">
-          <el-button size="small" @click="handleEdit(scope.row)"> 编辑 </el-button>
-          <el-button size="small" type="danger" @click="handleDelete(scope.row)"> 删除 </el-button>
+          <el-button size="small" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -75,29 +60,14 @@
         ref="formRef"
         :model="formData"
         :rules="formRules"
-        label-width="80px"
+        label-width="100px"
         label-position="right"
       >
         <el-form-item label="项目名称" prop="name">
           <el-input v-model="formData.name" placeholder="请输入项目名称" />
         </el-form-item>
-        <el-form-item label="项目状态" prop="status">
-          <el-select v-model="formData.status" placeholder="请选择状态" class="w-full">
-            <el-option label="进行中" value="1" />
-            <el-option label="已完成" value="2" />
-            <el-option label="已暂停" value="3" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="时间区间" prop="dateRange">
-          <el-date-picker
-            v-model="formData.dateRange"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            value-format="YYYY-MM-DD"
-            class="w-full"
-          />
+        <el-form-item label="存储根目录" prop="rootPath">
+          <el-input v-model="formData.rootPath" placeholder="请输入存储根目录" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -118,28 +88,23 @@ import type { FormInstance, FormRules } from 'element-plus';
 // 定义接口
 interface SearchFormState {
   name: string;
-  status: string;
 }
 
 interface ProjectItem {
   id: number;
   name: string;
-  status: string;
-  startDate: string;
-  endDate: string;
+  rootPath: string;
 }
 
 // 在接口定义区域添加 FormData 接口
 interface FormData {
   name: string;
-  status: string;
-  dateRange: [Date, Date] | undefined;
+  rootPath: string;
 }
 
 // 搜索表单数据
 const searchForm = reactive<SearchFormState>({
   name: '',
-  status: '',
 });
 
 // 表格数据
@@ -153,20 +118,11 @@ const total = ref<number>(0);
 const fetchData = async () => {
   loading.value = true;
   try {
-    // 这里替换为实际的API调用
-    // const res = await api.getProjectList({
-    //   page: currentPage.value,
-    //   pageSize: pageSize.value,
-    //   ...searchForm
-    // })
-
     // 模拟数据
     const mockData: ProjectItem[] = Array.from({ length: 10 }, (_, index) => ({
       id: index + 1,
       name: `项目${index + 1}`,
-      status: ['1', '2', '3'][Math.floor(Math.random() * 3)],
-      startDate: '2024-01-01',
-      endDate: '2024-12-31',
+      rootPath: `/data/projects/project${index + 1}`,
     }));
 
     tableData.value = mockData;
@@ -179,25 +135,6 @@ const fetchData = async () => {
   }
 };
 
-// 状态映射
-const getStatusText = (status: string): string => {
-  const statusMap: Record<string, string> = {
-    '1': '进行中',
-    '2': '已完成',
-    '3': '已暂停',
-  };
-  return statusMap[status] || '未知状态';
-};
-
-const getStatusType = (status: string): 'primary' | 'success' | 'warning' | 'info' => {
-  const typeMap: Record<string, 'primary' | 'success' | 'warning'> = {
-    '1': 'primary',
-    '2': 'success',
-    '3': 'warning',
-  };
-  return typeMap[status] || 'info';
-};
-
 // 搜索处理
 const handleSearch = (): void => {
   currentPage.value = 1;
@@ -207,7 +144,6 @@ const handleSearch = (): void => {
 // 重置搜索
 const resetSearch = (): void => {
   searchForm.name = '';
-  searchForm.status = '';
   handleSearch();
 };
 
@@ -228,8 +164,7 @@ const handleAdd = (): void => {
   dialogTitle.value = '新增项目';
   // 重置表单数据
   formData.name = '';
-  formData.status = '';
-  formData.dateRange = undefined;
+  formData.rootPath = '';
   // 重置表单验证
   nextTick(() => {
     formRef.value?.resetFields();
@@ -268,8 +203,7 @@ const dialogTitle = ref('新增项目');
 const formRef = ref<FormInstance>();
 const formData = reactive<FormData>({
   name: '',
-  status: '',
-  dateRange: undefined,
+  rootPath: '',
 });
 
 // 表单验证规则
@@ -278,8 +212,10 @@ const formRules: FormRules = {
     { required: true, message: '请输入项目名称', trigger: 'blur' },
     { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' },
   ],
-  status: [{ required: true, message: '请选择项目状态', trigger: 'change' }],
-  dateRange: [{ required: true, message: '请选择时间区间', trigger: 'change' }],
+  rootPath: [
+    { required: true, message: '请输入存储根目录', trigger: 'blur' },
+    { min: 1, max: 200, message: '长度在 1 到 200 个字符', trigger: 'blur' },
+  ],
 };
 
 // 添加新的处理函数
@@ -289,17 +225,15 @@ const handleDialogClose = () => {
 
 const handleSubmit = async () => {
   if (!formRef.value) return;
-  
+
   await formRef.value.validate((valid, fields) => {
     if (valid) {
       // 这里处理表单提交逻辑
       const submitData = {
         name: formData.name,
-        status: formData.status,
-        startDate: formData.dateRange?.[0],
-        endDate: formData.dateRange?.[1],
+        rootPath: formData.rootPath,
       };
-      
+
       console.log('提交的数据：', submitData);
       ElMessage.success('保存成功');
       dialogVisible.value = false;
