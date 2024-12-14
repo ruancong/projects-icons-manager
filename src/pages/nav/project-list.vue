@@ -146,17 +146,10 @@ onMounted(() => {
 // 数据获取
 const fetchData = async () => {
   loading.value = true;
-  // 模拟数据
-  const mockData: ProjectVO[] = Array.from({ length: 10 }, (_, index) => ({
-    id: index + 1 + '',
-    name: `项目${index + 1}`,
-    rootPath: `/data/projects/project${index + 1}`,
-  }));
 
-  const res = await api.queryPageProjects(1, 1);
-  console.log(res);
+  const dataList = await api.queryPageProjects(1, 1);
 
-  tableData.value = mockData;
+  tableData.value = dataList;
   total.value = 100;
 
   loading.value = false;

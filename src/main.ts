@@ -12,6 +12,20 @@ import { createApp } from 'vue';
 import { createRouter } from 'vue-router';
 import { createWebHistory } from 'vue-router';
 
+import getEnv from './utils/env';
+
+const { USE_MOCK } = getEnv();
+
+async function setupMocks() {
+  if (USE_MOCK) {
+    const { worker } = await import('./mocks/browser');
+    return worker.start({
+      onUnhandledRequest: 'bypass',
+    });
+  }
+  return Promise.resolve();
+}
+
 const app = createApp(App);
 app.use(
   createRouter({
@@ -22,4 +36,8 @@ app.use(
 app.use(ElementPlus, {
   locale: zhCn,
 });
-app.mount('#app');
+
+// 在应用启动前初始化 mock
+setupMocks().then(() => {
+  app.mount('#app');
+});
