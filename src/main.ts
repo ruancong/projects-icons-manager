@@ -13,15 +13,13 @@ import { createRouter } from 'vue-router';
 import { createWebHistory } from 'vue-router';
 
 import getEnv from './utils/env';
+import { setupMSW } from './mocks/browser';
 
 const { USE_MOCK } = getEnv();
 
 async function setupMocks() {
   if (USE_MOCK) {
-    const { worker } = await import('./mocks/browser');
-    return worker.start({
-      onUnhandledRequest: 'bypass',
-    });
+    return setupMSW();
   }
   return Promise.resolve();
 }
