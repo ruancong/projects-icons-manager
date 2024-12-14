@@ -3,6 +3,7 @@ import { useGlobalLoading } from '~/composables/useGlobalLoading';
 import { MyError } from '~/types/app-types';
 import { useGlobalMessage } from '~/composables/useGlobalMessage';
 import getEnv from './env';
+import { BaseResponse } from '~/types/api-vo-types';
 
 const { isShowGlobalLoading } = useGlobalLoading();
 
@@ -44,7 +45,8 @@ service.interceptors.response.use(
       const { error } = useGlobalMessage();
 
       error(response.data?.message || '服务器发生了点小意外!');
-      return Promise.reject(response);
+      const errorData: BaseResponse = { code: -1, msg: 'fail' };
+      return errorData;
     }
   },
   function (error) {
@@ -54,7 +56,9 @@ service.interceptors.response.use(
     } else {
       errorMsg('服务器发生了点小意外！');
     }
-    return Promise.reject(error);
+    const errorData: BaseResponse = { code: -11, msg: 'fail' };
+
+    return errorData;
   },
 );
 
