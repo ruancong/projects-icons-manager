@@ -33,14 +33,15 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   function (response) {
     if (response.status === 200) {
-      if (response.data.code !== '0') {
-        if (!notShowErrorMsg(response.data.code)) {
+      const serverData = response.data;
+      if (serverData.code !== '0') {
+        if (!notShowErrorMsg(serverData.code)) {
           const { error } = useGlobalMessage();
-          error(response.data.message || '发生了点异常！');
+          error(serverData.data.message || '发生了点异常！');
         }
-        throw new MyError(response.data.code, response.data.message);
+        throw new MyError(serverData.code, response.data.message);
       }
-      return response.data;
+      return serverData.data;
     } else {
       const { error } = useGlobalMessage();
 

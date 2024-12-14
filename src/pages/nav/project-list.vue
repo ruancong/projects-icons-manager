@@ -147,7 +147,7 @@ onMounted(() => {
 const fetchData = async () => {
   loading.value = true;
 
-  const dataList = await api.queryPageProjects(1, 1);
+  const dataList = await api.queryPageProjects(1, 10);
 
   tableData.value = dataList;
   total.value = 100;
