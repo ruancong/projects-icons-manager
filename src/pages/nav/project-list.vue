@@ -1,7 +1,7 @@
 <template>
-  <div class="project-list">
+  <div class="p-5">
     <!-- 搜索区域 -->
-    <div class="search-area">
+    <div class="mb-5 p-5 bg-white rounded">
       <el-form :inline="true" :model="searchForm">
         <el-form-item label="项目名称">
           <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
@@ -14,12 +14,12 @@
     </div>
 
     <!-- 表格工具栏 -->
-    <div class="table-toolbar">
+    <div class="mb-5">
       <el-button type="primary" @click="handleAdd">新增</el-button>
     </div>
 
     <!-- 表格区域 -->
-    <el-table v-loading="loading" :data="tableData" border style="width: 100%">
+    <el-table v-loading="loading" :data="tableData" class="border w-full">
       <el-table-column prop="id" label="序号" width="80" />
       <el-table-column prop="name" label="项目名称" />
       <el-table-column prop="rootPath" label="存储根目录" />
@@ -32,7 +32,7 @@
     </el-table>
 
     <!-- 分页区域 -->
-    <div class="pagination-container">
+    <div class="mt-5 flex justify-end">
       <el-pagination
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
@@ -48,7 +48,7 @@
       </el-pagination>
     </div>
 
-    <!-- 在原有代码最后添加弹窗组件 -->
+    <!-- 弹窗组件 -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
@@ -71,7 +71,7 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <span class="dialog-footer">
+        <span class="flex justify-end gap-3">
           <el-button @click="handleDialogClose">取消</el-button>
           <el-button type="primary" @click="handleSubmit">确定</el-button>
         </span>
@@ -247,33 +247,6 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.project-list {
-  padding: 20px;
-}
-
-.search-area {
-  margin-bottom: 20px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 4px;
-}
-
-.table-toolbar {
-  margin-bottom: 20px;
-}
-
-.pagination-container {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
 :deep(.el-dialog__body) {
   padding: 20px;
 }
