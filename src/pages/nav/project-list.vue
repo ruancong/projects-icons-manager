@@ -1,7 +1,7 @@
 <template>
-  <div class="p-5">
+  <div>
     <!-- 搜索区域 -->
-    <div class="mb-5 p-5 bg-white rounded">
+    <div class="my-container">
       <el-form :inline="true" :model="searchForm">
         <el-form-item label="项目名称">
           <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
@@ -11,42 +11,44 @@
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
+
+      <!-- 表格工具栏 -->
+      <div>
+        <el-button type="primary" @click="handleAdd">新增</el-button>
+      </div>
     </div>
 
-    <!-- 表格工具栏 -->
-    <div class="mb-5">
-      <el-button type="primary" @click="handleAdd">新增</el-button>
-    </div>
+    <div class="my-container">
+      <!-- 表格区域 -->
+      <el-table border v-loading="loading" :data="tableData" class="border w-full">
+        <el-table-column prop="id" label="序号" width="100" />
+        <el-table-column prop="name" label="项目名称" />
+        <el-table-column prop="rootPath" label="存储根目录" />
+        <el-table-column label="操作" width="200">
+          <template #default="scope">
+            <el-button size="small" type="primary" @click="handleToDetail(scope.row)"
+              >详情页</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <!-- 表格区域 -->
-    <el-table border v-loading="loading" :data="tableData" class="border w-full">
-      <el-table-column prop="id" label="序号" width="100" />
-      <el-table-column prop="name" label="项目名称" />
-      <el-table-column prop="rootPath" label="存储根目录" />
-      <el-table-column label="操作" width="200">
-        <template #default="scope">
-          <el-button size="small" type="primary" @click="handleToDetail(scope.row)"
-            >详情页</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <!-- 分页区域 -->
-    <div class="mt-5 flex justify-end">
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[10, 20, 50, 100]"
-        :total="total"
-        :background="true"
-        layout="total, sizes, prev, pager, next, jumper"
-        popper-class="pagination-popper"
-        :default-page-size="10"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      >
-      </el-pagination>
+      <!-- 分页区域 -->
+      <div class="mt-5 flex justify-end">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
+          :background="true"
+          layout="total, sizes, prev, pager, next, jumper"
+          popper-class="pagination-popper"
+          :default-page-size="10"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        >
+        </el-pagination>
+      </div>
     </div>
 
     <!-- 弹窗组件 -->
@@ -190,7 +192,12 @@ const handleAdd = (): void => {
 };
 
 const handleToDetail = (row: ProjectVO): void => {
-  router.push(`/project/${row.id}`);
+  router.push({
+    path: `/project/${row.id}`,
+    state: {
+      name: row.name
+    }
+  });
 };
 
 // 弹窗相关方法

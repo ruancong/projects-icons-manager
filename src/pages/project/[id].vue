@@ -1,8 +1,9 @@
 <template>
-  <div class="p-5">
+  <div>
     <!-- 顶部操作栏 -->
-    <div class="mb-2 p-4 bg-white rounded shadow-sm">
+    <div my-container>
       <div>
+        <h3 class="mb-4 mt-0">项目：{{ projectName }}</h3>
         <el-button type="primary" @click="handleEdit">
           <el-icon><Edit /></el-icon>
           编辑项目
@@ -20,8 +21,8 @@
     </div>
 
     <!-- 项目详情内容区 -->
-    <div class="p-3 bg-white rounded shadow-sm">
-      <h3 class="mb-4">项目 - {{ projectId }} - icon列表</h3>
+    <div my-container>
+      <h3 class="mb-4 mt-0">项目中icon列表</h3>
 
       <!-- Icon列表表格 -->
       <el-table border v-loading="tableLoading" :data="iconList" stripe style="width: 100%">
@@ -83,6 +84,7 @@ import type { IconVO } from '~/types/api-vo-types';
 const route = useRoute<'/project/[id]'>();
 const router = useRouter();
 const projectId = route.params.id;
+const projectName = history.state.name;
 const deleteDialogVisible = ref(false);
 
 // 编辑项目

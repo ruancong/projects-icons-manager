@@ -6,6 +6,7 @@ import App from './App.vue';
 import '~/styles/index.scss';
 
 import 'uno.css';
+import '@unocss/reset/normalize.css';
 import 'element-plus/dist/index.css';
 
 import { createApp } from 'vue';
