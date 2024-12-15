@@ -28,7 +28,16 @@
       <el-table border v-loading="tableLoading" :data="iconList" stripe style="width: 100%">
         <el-table-column type="index" label="序号" width="80" />
         <el-table-column prop="name" label="Icon名称" />
-        <el-table-column prop="ossPath" label="OSS路径" show-overflow-tooltip />
+        <el-table-column prop="ossPath" label="OSS路径" show-overflow-tooltip>
+          <template #default="scope">
+            <div class="flex items-center gap-2">
+              <span>{{ scope.row.ossPath }}</span>
+              <el-button size="small" link @click="copyToClipboard(scope.row.name, scope.row.ossPath)">
+                <el-icon><CopyDocument /></el-icon>
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column prop="version" label="当前版本号" width="120" />
         <el-table-column label="操作">
           <template #default="scope">
@@ -77,15 +86,19 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Delete, Edit, More, View } from '@element-plus/icons-vue';
+import { Delete, Edit, More, View, CopyDocument } from '@element-plus/icons-vue';
 import api from '~/api/api';
 import type { IconVO } from '~/types/api-vo-types';
+import { ElMessage } from 'element-plus';
+import { useClipboard } from '@vueuse/core';
 
 const route = useRoute<'/project/[id]'>();
 const router = useRouter();
 const projectId = route.params.id;
 const projectName = history.state.name;
 const deleteDialogVisible = ref(false);
+// 使用 useClipboard hook
+const { copy } = useClipboard();
 
 // 编辑项目
 const handleEdit = () => {
@@ -145,6 +158,12 @@ const handleIconEdit = (row: IconVO) => {
 const handleIconDelete = (row: IconVO) => {
   // 实现删除逻辑
   console.log('删除图标:', row);
+};
+
+// 修改复制函数
+const copyToClipboard = async (iconName: string, ossPath: string) => {
+  await copy(ossPath);
+  ElMessage.success(`${iconName}-复制成功`);
 };
 
 // 页面加载时获取数据
