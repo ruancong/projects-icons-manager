@@ -151,7 +151,7 @@ import { UploadIconDTO } from '~/types/api-dto-types';
 
 const route = useRoute<'/project/[id]'>();
 const router = useRouter();
-const projectId = route.params.id;
+const projectId = route.params.id as string;
 const projectName = history.state.name;
 const deleteDialogVisible = ref(false);
 // 使用 useClipboard hook
