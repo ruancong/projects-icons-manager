@@ -22,8 +22,8 @@ const mockIconsList: IconVO[] = Array.from({ length: 38 }, (_, index) => ({
   id: index + 1 + '',
   name: `icon_${index + 1}`,
   // https://robohash.org/112122212.png?size=40x40
-  ossPath: `https://robohash.org/${projectId}-${index + 1}.png?size=40x40`,
-  version: Math.floor(1 + Math.random() * 10),
+  fullOssPath: `https://robohash.org/${projectId}-${index + 1}.png?size=40x40`,
+  version: 1,
 }));
 
 const { BASE_API_URL } = getEnv();
@@ -87,7 +87,7 @@ export const handlers = [
     mockIconsList.unshift({
       id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
       name: uploadIconDTO.name,
-      ossPath: `https://robohash.org/${uploadIconDTO.ossPath}?size=40x40`,
+      fullOssPath: `https://robohash.org/${uploadIconDTO.ossPath}?size=40x40`,
       version: 1,
     });
 
@@ -96,6 +96,32 @@ export const handlers = [
       code: BusinessCodeEnum.SUCCESS,
       data: null,
       msg: 'scucess',
+    });
+  }),
+
+  // 添加更新图标的 handler
+  http.post(`${BASE_API_URL}${API_PATH.UPDATE_ICON}`, async ({ request }) => {
+    await randomDelay();
+
+    const uploadIconDTO = (await request.json()) as UploadIconDTO;
+
+    // 在 mock 数据中查找并更新图标
+    const iconIndex = mockIconsList.findIndex((icon) => icon.id === uploadIconDTO.id);
+    if (iconIndex !== -1) {
+      mockIconsList[iconIndex] = {
+        ...mockIconsList[iconIndex],
+        name: uploadIconDTO.name,
+        fullOssPath: uploadIconDTO.ossPath
+          ? `https://robohash.org/${uploadIconDTO.ossPath}?size=40x40`
+          : mockIconsList[iconIndex].fullOssPath,
+        version: mockIconsList[iconIndex].version + 1,
+      };
+    }
+
+    return HttpResponse.json<BaseResponse<null>>({
+      code: BusinessCodeEnum.SUCCESS,
+      data: null,
+      msg: 'success',
     });
   }),
 ];

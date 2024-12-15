@@ -19,6 +19,6 @@ export interface ProjectVO {
 export interface IconVO {
   id: string;
   name: string;
-  ossPath: string;
+  fullOssPath: string;
   version: number;
 }

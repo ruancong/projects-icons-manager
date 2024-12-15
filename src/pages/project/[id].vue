@@ -33,14 +33,10 @@
         <el-table-column type="index" label="序号" width="80" />
         <el-table-column prop="name" label="Icon名称" />
         <el-table-column prop="ossPath" label="OSS路径" show-overflow-tooltip>
-          <template #default="scope">
+          <template #default="{ row }: { row: IconVO }">
             <div class="flex items-center gap-2">
-              <span>{{ scope.row.ossPath }}</span>
-              <el-button
-                size="small"
-                link
-                @click="copyToClipboard(scope.row.name, scope.row.ossPath)"
-              >
+              <span>{{ row.fullOssPath }}</span>
+              <el-button size="small" link @click="copyToClipboard(row.name, row.fullOssPath)">
                 <el-icon><CopyDocument /></el-icon>
               </el-button>
             </div>
@@ -48,8 +44,8 @@
         </el-table-column>
 
         <el-table-column label="预览" width="120">
-          <template #default="scope">
-            <el-image :src="scope.row.ossPath" fit="contain" class="w-10 h-10">
+          <template #default="{ row }: { row: IconVO }">
+            <el-image :src="row.fullOssPath" fit="contain" class="w-10 h-10">
               <template #error>
                 <div class="flex items-center justify-center bg-gray-100 flex-col h-full">
                   <el-icon><Picture /></el-icon>
@@ -102,10 +98,19 @@
     </el-dialog>
 
     <!-- 新增 Icon 弹窗表单 -->
-    <el-dialog v-model="addIconDialogVisible" title="新增Icon" width="500px">
-      <el-form ref="addIconFormRef" :model="addIconForm" :rules="addIconRules" label-width="100px">
+    <el-dialog v-model="iconDialogVisible" :title="isEdit ? '编辑Icon' : '新增Icon'" width="500px">
+      <el-form ref="iconFormRef" :model="iconForm" :rules="iconFormRules" label-width="100px">
         <el-form-item label="Icon名称" prop="name">
-          <el-input v-model="addIconForm.name" placeholder="请输入Icon名称" />
+          <el-input v-model="iconForm.name" placeholder="请输入Icon名称" />
+        </el-form-item>
+        <el-form-item v-if="isEdit" label="原Icon预览">
+          <el-image
+            v-if="currentEditIconVO"
+            :src="currentEditIconVO.fullOssPath"
+            :preview-src-list="[currentEditIconVO.fullOssPath]"
+            class="w-10 h-10"
+            fit="contain"
+          />
         </el-form-item>
         <el-form-item label="Icon文件" prop="file">
           <el-upload
@@ -128,7 +133,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="addIconDialogVisible = false">取消</el-button>
+          <el-button @click="iconDialogVisible = false">取消</el-button>
           <el-button type="primary" @click="handleIconSubmit" :loading="submitLoading">
             确定
           </el-button>
@@ -139,7 +144,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Delete, Edit, More, CopyDocument, Picture } from '@element-plus/icons-vue';
 import api from '~/api/api';
@@ -201,11 +206,103 @@ const handleCurrentChange = (val: number) => {
   getIconList();
 };
 
-const handleIconEdit = (row: IconVO) => {
-  // 实现编辑逻辑
-  console.log('编辑图标:', row);
+const iconDialogVisible = ref(false);
+const isEdit = ref(false);
+const currentEditIconVO = ref<IconVO | null>(null);
+
+const iconFormRef = ref<FormInstance>();
+const uploadRef = ref<UploadInstance>();
+const submitLoading = ref(false);
+
+const iconForm = ref({
+  name: '',
+  file: null as File | null,
+});
+
+const iconFormRules = computed(() => ({
+  name: [
+    { required: true, message: '请输入Icon名称', trigger: 'blur' },
+    { min: 2, max: 50, message: 'Icon名称长度应在2-50个字符之间', trigger: 'blur' },
+  ],
+  file: [{ required: !isEdit.value, message: '请上传Icon文件', trigger: 'change' }],
+}));
+
+// 处理文件选择
+const handleFileChange = (file: UploadFile) => {
+  iconForm.value.file = file.raw || null;
 };
 
+// 处理文件移除
+const handleFileRemove = () => {
+  iconForm.value.file = null;
+};
+
+// 打开新增 Icon 弹窗
+const handleAddIcon = () => {
+  isEdit.value = false;
+  currentEditIconVO.value = null;
+  iconForm.value = {
+    name: '',
+    file: null,
+  };
+  iconFormRef.value?.clearValidate();
+  iconDialogVisible.value = true;
+};
+
+// 编辑方法
+const handleIconEdit = (row: IconVO) => {
+  isEdit.value = true;
+  currentEditIconVO.value = row;
+  iconForm.value = {
+    name: row.name,
+    file: null,
+  };
+  iconFormRef.value?.clearValidate();
+  iconDialogVisible.value = true;
+};
+
+// 提交方法
+const handleIconSubmit = async () => {
+  if (!iconFormRef.value) return;
+
+  await iconFormRef.value.validate(async (valid) => {
+    if (valid) {
+      submitLoading.value = true;
+
+      // todo 上传文件到oss , 获取ossPath
+      const uploadOssPath = await uploadToOss(iconForm.value.file);
+
+      const uploadIconDTO: UploadIconDTO = {
+        name: iconForm.value.name,
+        projectId: projectId,
+        ossPath: uploadOssPath,
+        id: isEdit.value ? currentEditIconVO.value?.id : undefined,
+      };
+
+      // 根据是否是编辑模式调用不同的 API
+      if (isEdit.value) {
+        await api.updateIcon(uploadIconDTO);
+        ElMessage.success('Icon更新成功');
+      } else {
+        await api.addIcon(uploadIconDTO);
+        ElMessage.success('Icon上传成功');
+      }
+
+      iconDialogVisible.value = false;
+
+      // 重置表单
+      iconFormRef.value?.resetFields();
+      iconForm.value.file = null;
+      uploadRef.value?.clearFiles();
+
+      // 刷新列表
+      await getIconList();
+      submitLoading.value = false;
+    }
+  });
+};
+
+// 删除图标
 const handleIconDelete = (row: IconVO) => {
   // 实现删除逻辑
   console.log('删除图标:', row);
@@ -222,75 +319,15 @@ onMounted(() => {
   getIconList();
 });
 
-// 新增 Icon 相关
-const addIconDialogVisible = ref(false);
-const addIconFormRef = ref<FormInstance>();
-const uploadRef = ref<UploadInstance>();
-const submitLoading = ref(false);
-
-const addIconForm = ref({
-  name: '',
-  file: null as File | null,
-});
-
-const addIconRules = {
-  name: [
-    { required: true, message: '请输入Icon名称', trigger: 'blur' },
-    { min: 2, max: 50, message: 'Icon名称长度应在2-50个字符之间', trigger: 'blur' },
-  ],
-  file: [{ required: true, message: '请上传Icon文件', trigger: 'change' }],
-};
-
-// 处理文件选择
-const handleFileChange = (file: UploadFile) => {
-  addIconForm.value.file = file.raw || null;
-};
-
-// 处理文件移除
-const handleFileRemove = () => {
-  addIconForm.value.file = null;
-};
-
-// 打开新增 Icon  弹窗
-const handleAddIcon = () => {
-  addIconDialogVisible.value = true;
-};
-
-// 提交新增 Icon
-const handleIconSubmit = async () => {
-  if (!addIconFormRef.value) return;
-
-  await addIconFormRef.value.validate(async (valid) => {
-    if (valid) {
-      submitLoading.value = true;
-
-      // todo 上传文件到oss , 获取ossPath
-      const formData = new FormData();
-      if (addIconForm.value.file) {
-        formData.append('file', addIconForm.value.file);
-      }
-
-      const uploadIconDTO: UploadIconDTO = {
-        name: addIconForm.value.name,
-        projectId: projectId,
-        ossPath: addIconForm.value.file?.name || '',
-      };
-
-      await api.addIcon(uploadIconDTO);
-      ElMessage.success('Icon上传成功');
-      addIconDialogVisible.value = false;
-
-      // 重置表单
-      addIconFormRef.value?.resetFields();
-      addIconForm.value.file = null;
-      // 清空上传组件的文件列表
-      uploadRef.value?.clearFiles();
-
-      // 刷新列表
-      await getIconList();
-
-      submitLoading.value = false;
-    }
-  });
-};
+function uploadToOss(file: File | null) {
+  const formData = new FormData();
+  if (file) {
+    formData.append('file', file);
+    // todo 上传文件到oss , 获取ossPath
+    // 随机生��一个8位字符串作为文件名
+    const ossPath = Math.random().toString(36).substring(2, 15);
+    return ossPath;
+  }
+  return '';
+}
 </script>

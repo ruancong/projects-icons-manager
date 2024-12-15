@@ -6,6 +6,7 @@ export const API_PATH = {
   QUERY_PORJECTS: '/api/project/page-list',
   QUERY_PROJECT_ICONS: '/api/projects/:projectId/icons',
   ADD_ICON: '/api/icon/add',
+  UPDATE_ICON: '/api/icon/update',
 };
 
 const queryPageProjects = async (
@@ -36,4 +37,8 @@ const addIcon = async (uploadIconDTO: UploadIconDTO) => {
   return request.post(API_PATH.ADD_ICON, uploadIconDTO);
 };
 
-export default { queryPageProjects, queryProjectIcons, addIcon };
+const updateIcon = async (uploadIconDTO: UploadIconDTO) => {
+  return request.post(API_PATH.UPDATE_ICON, uploadIconDTO);
+};
+
+export default { queryPageProjects, queryProjectIcons, addIcon, updateIcon };
