@@ -10,6 +10,12 @@
   </el-config-provider>
 </template>
 
+<script setup lang="ts">
+import { useGlobalLoading } from './composables/useGlobalLoading';
+
+useGlobalLoading();
+</script>
+
 <style>
 #app {
   color: var(--ep-text-color-primary);
