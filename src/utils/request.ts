@@ -37,7 +37,7 @@ service.interceptors.response.use(
       if (serverData.code !== '0') {
         if (!notShowErrorMsg(serverData.code)) {
           const { error } = useGlobalMessage();
-          error(serverData.data.message || '发生了点异常！');
+          error(serverData.message || '发生了点异常！');
         }
         throw new MyError(serverData.code, response.data.message);
       }
