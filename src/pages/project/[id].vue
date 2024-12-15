@@ -1,7 +1,7 @@
 <template>
-  <div class="project-detail">
+  <div class="p-5">
     <!-- 顶部操作栏 -->
-    <div class="action-bar">
+    <div class="mb-5 p-4 bg-white rounded shadow-sm">
       <el-button-group>
         <el-button type="primary" @click="handleEdit">
           <el-icon><Edit /></el-icon>
@@ -20,7 +20,7 @@
     </div>
 
     <!-- 项目详情内容区 -->
-    <div class="content">
+    <div class="p-6 bg-white rounded shadow-sm">
       <h1>项目详情 - {{ projectId }}</h1>
       <!-- 项目详情内容 -->
     </div>
@@ -29,7 +29,7 @@
     <el-dialog v-model="deleteDialogVisible" title="确认删除" width="30%">
       <span>确定要删除该项目吗？此操作不可恢复。</span>
       <template #footer>
-        <span class="dialog-footer">
+        <span class="flex justify-end gap-3">
           <el-button @click="deleteDialogVisible = false">取消</el-button>
           <el-button type="danger" @click="handleDelete">确定删除</el-button>
         </span>
@@ -66,30 +66,3 @@ const handleMore = () => {
   // 实现更多操作的逻辑
 };
 </script>
-
-<style scoped>
-.project-detail {
-  padding: 20px;
-}
-
-.action-bar {
-  margin-bottom: 20px;
-  padding: 16px;
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.content {
-  background-color: #fff;
-  padding: 24px;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-</style>
