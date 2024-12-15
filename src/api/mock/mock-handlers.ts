@@ -1,7 +1,10 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse, delay } from 'msw';
 import { BasePageData, BaseResponse, ProjectVO } from '~/types/api-vo-types';
 import { API_PATH } from '../api';
 import { BusinessCodeEnum } from '~/utils/constants';
+
+// 添加随机延迟函数
+const randomDelay = () => delay(500 + Math.random() * 1000);
 
 // 模拟数据
 const mockProjects: ProjectVO[] = Array.from({ length: 87 }, (_, index) => ({
@@ -11,7 +14,9 @@ const mockProjects: ProjectVO[] = Array.from({ length: 87 }, (_, index) => ({
 }));
 
 export const handlers = [
-  http.get(API_PATH.QUERY_PORJECTS, ({ request }) => {
+  http.get(API_PATH.QUERY_PORJECTS, async ({ request }) => {
+    await randomDelay(); // 使用随机延迟
+
     const url = new URL(request.url);
     const page = Number(url.searchParams.get('page')) || 1;
     const pageSize = Number(url.searchParams.get('pageSize')) || 10;
