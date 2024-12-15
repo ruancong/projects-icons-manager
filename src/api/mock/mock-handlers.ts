@@ -19,7 +19,8 @@ const generateMockIcons = (projectId: string): IconVO[] => {
   return Array.from({ length: 38 }, (_, index) => ({
     id: index + 1,
     name: `icon_${index + 1}`,
-    ossPath: `https://example.com/projects/${projectId}/icons/icon_${index + 1}.svg`,
+    // https://robohash.org/112122212.png?size=40x40
+    ossPath: `https://robohash.org/${projectId}-${index + 1}.png?size=40x40`,
     version: Math.floor(1 + Math.random() * 10),
   }));
 };

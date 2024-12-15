@@ -32,23 +32,39 @@
           <template #default="scope">
             <div class="flex items-center gap-2">
               <span>{{ scope.row.ossPath }}</span>
-              <el-button size="small" link @click="copyToClipboard(scope.row.name, scope.row.ossPath)">
+              <el-button
+                size="small"
+                link
+                @click="copyToClipboard(scope.row.name, scope.row.ossPath)"
+              >
                 <el-icon><CopyDocument /></el-icon>
               </el-button>
             </div>
+          </template>
+        </el-table-column>
+
+        <el-table-column label="预览" width="120">
+          <template #default="scope">
+            <el-image :src="scope.row.ossPath" fit="contain" class="w-10 h-10">
+              <template #error>
+                <div class="flex items-center justify-center bg-gray-100 flex-col h-full">
+                  <el-icon><Picture /></el-icon>
+                  <span class="text-xs text-red mt-1">error</span>
+                </div>
+              </template>
+            </el-image>
           </template>
         </el-table-column>
         <el-table-column prop="version" label="当前版本号" width="120" />
         <el-table-column label="操作">
           <template #default="scope">
             <div>
-              <el-button size="small" @click="handlePreview(scope.row)">
-                <el-icon><View /></el-icon>
-              </el-button>
               <el-button size="small" type="primary" @click="handleIconEdit(scope.row)">
+                <span>编辑</span>
                 <el-icon><Edit /></el-icon>
               </el-button>
               <el-button size="small" type="danger" @click="handleIconDelete(scope.row)">
+                <span>删除</span>
                 <el-icon><Delete /></el-icon>
               </el-button>
             </div>
@@ -86,7 +102,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Delete, Edit, More, View, CopyDocument } from '@element-plus/icons-vue';
+import { Delete, Edit, More, CopyDocument, Picture } from '@element-plus/icons-vue';
 import api from '~/api/api';
 import type { IconVO } from '~/types/api-vo-types';
 import { ElMessage } from 'element-plus';
@@ -142,12 +158,6 @@ const handleSizeChange = (val: number) => {
 const handleCurrentChange = (val: number) => {
   currentPage.value = val;
   getIconList();
-};
-
-// 图标操作函数
-const handlePreview = (row: IconVO) => {
-  // 实现预览逻辑
-  console.log('预览图标:', row);
 };
 
 const handleIconEdit = (row: IconVO) => {

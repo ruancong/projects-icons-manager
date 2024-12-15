@@ -13,12 +13,14 @@
       </el-form>
 
       <!-- 表格工具栏 -->
-      <div>
-        <el-button type="primary" @click="handleAdd">新增</el-button>
-      </div>
     </div>
 
     <div class="my-container">
+      <h3 class="mb-4 mt-0">项目列表</h3>
+      <div mb-2>
+        <el-button type="primary" @click="handleAdd">新增</el-button>
+      </div>
+
       <!-- 表格区域 -->
       <el-table border v-loading="loading" :data="tableData" class="border w-full">
         <el-table-column prop="id" label="序号" width="100" />
@@ -26,9 +28,10 @@
         <el-table-column prop="rootPath" label="存储根目录" />
         <el-table-column label="操作" width="200">
           <template #default="scope">
-            <el-button size="small" type="primary" @click="handleToDetail(scope.row)"
-              >详情页</el-button
-            >
+            <el-button size="small" type="primary" @click="handleToDetail(scope.row)">
+              <span>详情页</span>
+              <el-icon><MoreFilled /></el-icon>
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -91,6 +94,7 @@ import { useRouter } from 'vue-router';
 import { useGlobalMessage } from '~/composables/useGlobalMessage';
 import { ProjectVO } from '~/types/api-vo-types';
 import api from '~/api/api';
+import { MoreFilled } from '@element-plus/icons-vue';
 
 // 1. 接口定义
 interface SearchFormState {
@@ -195,8 +199,8 @@ const handleToDetail = (row: ProjectVO): void => {
   router.push({
     path: `/project/${row.id}`,
     state: {
-      name: row.name
-    }
+      name: row.name,
+    },
   });
 };
 
