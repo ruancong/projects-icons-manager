@@ -20,7 +20,7 @@ const generateMockIcons = (projectId: string): IconVO[] => {
     id: index + 1,
     name: `icon_${index + 1}`,
     ossPath: `https://example.com/projects/${projectId}/icons/icon_${index + 1}.svg`,
-    version: `1.0.${Math.floor(Math.random() * 10)}`,
+    version: Math.floor(1 + Math.random() * 10),
   }));
 };
 

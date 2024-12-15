@@ -1,8 +1,8 @@
 <template>
   <div class="p-5">
     <!-- 顶部操作栏 -->
-    <div class="mb-5 p-4 bg-white rounded shadow-sm">
-      <el-button-group>
+    <div class="mb-2 p-4 bg-white rounded shadow-sm">
+      <div>
         <el-button type="primary" @click="handleEdit">
           <el-icon><Edit /></el-icon>
           编辑项目
@@ -16,45 +16,32 @@
           <el-icon><More /></el-icon>
           更多操作
         </el-button>
-      </el-button-group>
+      </div>
     </div>
 
     <!-- 项目详情内容区 -->
-    <div class="p-6 bg-white rounded shadow-sm">
-      <h1 class="mb-4">项目详情 - {{ projectId }}</h1>
+    <div class="p-3 bg-white rounded shadow-sm">
+      <h3 class="mb-4">项目 - {{ projectId }} - icon列表</h3>
 
       <!-- Icon列表表格 -->
-      <el-table
-        v-loading="tableLoading"
-        :data="iconList"
-        stripe
-        style="width: 100%"
-      >
+      <el-table border v-loading="tableLoading" :data="iconList" stripe style="width: 100%">
         <el-table-column type="index" label="序号" width="80" />
         <el-table-column prop="name" label="Icon名称" />
         <el-table-column prop="ossPath" label="OSS路径" show-overflow-tooltip />
         <el-table-column prop="version" label="当前版本号" width="120" />
         <el-table-column label="操作">
           <template #default="scope">
-            <el-button size="small" class="action-button" @click="handlePreview(scope.row)">
-              <el-icon><View /></el-icon>
-            </el-button>
-            <el-button
-              size="small"
-              type="primary"
-              class="action-button"
-              @click="handleIconEdit(scope.row)"
-            >
-              <el-icon><Edit /></el-icon>
-            </el-button>
-            <el-button
-              size="small"
-              type="danger"
-              class="action-button"
-              @click="handleIconDelete(scope.row)"
-            >
-              <el-icon><Delete /></el-icon>
-            </el-button>
+            <div>
+              <el-button size="small" @click="handlePreview(scope.row)">
+                <el-icon><View /></el-icon>
+              </el-button>
+              <el-button size="small" type="primary" @click="handleIconEdit(scope.row)">
+                <el-icon><Edit /></el-icon>
+              </el-button>
+              <el-button size="small" type="danger" @click="handleIconDelete(scope.row)">
+                <el-icon><Delete /></el-icon>
+              </el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
@@ -163,12 +150,3 @@ onMounted(() => {
   getIconList();
 });
 </script>
-
-<style scoped>
-.action-button {
-  margin-right: 8px; /* 添加右侧间距 */
-}
-.action-button:last-child {
-  margin-right: 0; /* 最后一个按钮不需要右侧间距 */
-}
-</style>
