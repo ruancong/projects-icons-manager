@@ -1,8 +1,9 @@
 import { setupWorker } from 'msw/browser'
-import { handlers } from '../api/mock-handlers'
+import getEnv from '~/utils/env';
+import { handlers } from './mock-handlers';
 
 // 获取当前的 base URL
-const baseUrl = import.meta.env.BASE_URL;
+const baseUrl = getEnv().BASE_URL;
 
 export const worker = setupWorker(...handlers)
 

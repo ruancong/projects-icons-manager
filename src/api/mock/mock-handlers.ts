@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
-import { API_PATH } from './api';
 import { ProjectVO } from '~/types/api-vo-types';
+import { API_PATH } from '../api';
 
 // 模拟数据
 const mockProjects: ProjectVO[] = Array.from({ length: 10 }, (_, index) => ({

@@ -11,18 +11,7 @@ import 'element-plus/dist/index.css';
 import { createApp } from 'vue';
 import { createRouter } from 'vue-router';
 import { createWebHistory } from 'vue-router';
-
-import getEnv from './utils/env';
-import { setupMSW } from './mocks/browser';
-
-const { USE_MOCK } = getEnv();
-
-async function setupMocks() {
-  if (USE_MOCK) {
-    return setupMSW();
-  }
-  return Promise.resolve();
-}
+import { setupMocks } from './api/mock/init';
 
 const app = createApp(App);
 app.use(
