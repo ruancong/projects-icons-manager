@@ -251,7 +251,7 @@ const handleFileRemove = () => {
   addIconForm.value.file = null;
 };
 
-// 打开新增 Icon 弹窗
+// 打开新增 Icon  弹窗
 const handleAddIcon = () => {
   addIconDialogVisible.value = true;
 };
