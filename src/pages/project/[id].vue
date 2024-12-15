@@ -24,24 +24,37 @@
       <h1 class="mb-4">项目详情 - {{ projectId }}</h1>
 
       <!-- Icon列表表格 -->
-      <el-table :data="iconList" stripe style="width: 100%">
+      <el-table
+        v-loading="tableLoading"
+        :data="iconList"
+        stripe
+        style="width: 100%"
+      >
         <el-table-column type="index" label="序号" width="80" />
         <el-table-column prop="name" label="Icon名称" />
         <el-table-column prop="ossPath" label="OSS路径" show-overflow-tooltip />
         <el-table-column prop="version" label="当前版本号" width="120" />
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作">
           <template #default="scope">
-            <el-button-group>
-              <el-button size="small" @click="handlePreview(scope.row)">
-                <el-icon><View /></el-icon>
-              </el-button>
-              <el-button size="small" type="primary" @click="handleIconEdit(scope.row)">
-                <el-icon><Edit /></el-icon>
-              </el-button>
-              <el-button size="small" type="danger" @click="handleIconDelete(scope.row)">
-                <el-icon><Delete /></el-icon>
-              </el-button>
-            </el-button-group>
+            <el-button size="small" class="action-button" @click="handlePreview(scope.row)">
+              <el-icon><View /></el-icon>
+            </el-button>
+            <el-button
+              size="small"
+              type="primary"
+              class="action-button"
+              @click="handleIconEdit(scope.row)"
+            >
+              <el-icon><Edit /></el-icon>
+            </el-button>
+            <el-button
+              size="small"
+              type="danger"
+              class="action-button"
+              @click="handleIconDelete(scope.row)"
+            >
+              <el-icon><Delete /></el-icon>
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -107,12 +120,15 @@ const iconList = ref<IconVO[]>([]);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
+const tableLoading = ref(false);
 
 // 获取图标列表
 const getIconList = async () => {
+  tableLoading.value = true;
   const response = await api.queryProjectIcons(projectId, currentPage.value, pageSize.value);
   iconList.value = response.list;
   total.value = response.total;
+  tableLoading.value = false;
 };
 
 // 分页处理函数
@@ -147,3 +163,12 @@ onMounted(() => {
   getIconList();
 });
 </script>
+
+<style scoped>
+.action-button {
+  margin-right: 8px; /* 添加右侧间距 */
+}
+.action-button:last-child {
+  margin-right: 0; /* 最后一个按钮不需要右侧间距 */
+}
+</style>
