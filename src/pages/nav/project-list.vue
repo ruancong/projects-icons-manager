@@ -18,7 +18,7 @@
     <div class="my-container">
       <h3 class="mb-4 mt-0">项目列表</h3>
       <div mb-2>
-        <el-button :disabled="true" type="primary" @click="handleAdd">新增</el-button>
+        <el-button type="primary" @click="handleAdd">新增</el-button>
       </div>
 
       <!-- 表格区域 -->
