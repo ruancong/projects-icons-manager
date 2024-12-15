@@ -3,27 +3,28 @@ import { BasePageData, BaseResponse, ProjectVO, IconVO } from '~/types/api-vo-ty
 import { API_PATH } from '../api';
 import { BusinessCodeEnum } from '~/utils/constants';
 import getEnv from '~/utils/env';
+import { UploadIconDTO } from '~/types/api-dto-types';
 
 // 添加随机延迟函数
 const randomDelay = () => delay(500 + Math.random() * 1000);
 
 // 模拟数据
-const mockProjects: ProjectVO[] = Array.from({ length: 87 }, (_, index) => ({
+const mockProjectsList: ProjectVO[] = Array.from({ length: 87 }, (_, index) => ({
   id: index + 1 + '',
   name: `项目${index + 1}`,
   rootPath: `/data/projects/project${index + 1}`,
 }));
 
 // Mock 图标数据生成函数
-const generateMockIcons = (projectId: string): IconVO[] => {
-  return Array.from({ length: 38 }, (_, index) => ({
-    id: index + 1,
-    name: `icon_${index + 1}`,
-    // https://robohash.org/112122212.png?size=40x40
-    ossPath: `https://robohash.org/${projectId}-${index + 1}.png?size=40x40`,
-    version: Math.floor(1 + Math.random() * 10),
-  }));
-};
+// 生成随机的8位projectId
+const projectId = Math.random().toString(36).substring(2, 10);
+const mockIconsList: IconVO[] = Array.from({ length: 38 }, (_, index) => ({
+  id: index + 1 + '',
+  name: `icon_${index + 1}`,
+  // https://robohash.org/112122212.png?size=40x40
+  ossPath: `https://robohash.org/${projectId}-${index + 1}.png?size=40x40`,
+  version: Math.floor(1 + Math.random() * 10),
+}));
 
 const { BASE_API_URL } = getEnv();
 
@@ -37,14 +38,14 @@ export const handlers = [
 
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    const data = mockProjects.slice(start, end);
+    const data = mockProjectsList.slice(start, end);
 
     return HttpResponse.json<BaseResponse<BasePageData<ProjectVO>>>({
       code: BusinessCodeEnum.SUCCESS,
       data: {
         list: data,
-        total: mockProjects.length,
-        totalPages: Math.ceil(mockProjects.length / pageSize),
+        total: mockProjectsList.length,
+        totalPages: Math.ceil(mockProjectsList.length / pageSize),
       },
       msg: 'success',
     });
@@ -58,20 +59,43 @@ export const handlers = [
     const page = Number(url.searchParams.get('page')) || 1;
     const pageSize = Number(url.searchParams.get('pageSize')) || 10;
     const projectId = params.projectId as string;
+    console.log('projectId', projectId);
 
-    const mockIcons = generateMockIcons(projectId);
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    const data = mockIcons.slice(start, end);
+    const data = mockIconsList.slice(start, end);
 
     return HttpResponse.json<BaseResponse<BasePageData<IconVO>>>({
       code: BusinessCodeEnum.SUCCESS,
       data: {
         list: data,
-        total: mockIcons.length,
-        totalPages: Math.ceil(mockIcons.length / pageSize),
+        total: mockProjectsList.length,
+        totalPages: Math.ceil(mockProjectsList.length / pageSize),
       },
       msg: 'success',
+    });
+  }),
+
+  // Add new handler for icon upload
+  http.post(`${BASE_API_URL}${API_PATH.ADD_ICON}`, async ({ request }) => {
+    await randomDelay();
+
+    const uploadIconDTO = (await request.json()) as UploadIconDTO;
+    console.log('uploadIconDTO', uploadIconDTO);
+
+    // Add the new icon to the mock data
+    mockIconsList.unshift({
+      id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+      name: uploadIconDTO.name,
+      ossPath: `https://robohash.org/${uploadIconDTO.ossPath}?size=40x40`,
+      version: 1,
+    });
+
+    // Mock a successful response
+    return HttpResponse.json<BaseResponse<null>>({
+      code: BusinessCodeEnum.SUCCESS,
+      data: null,
+      msg: 'scucess',
     });
   }),
 ];

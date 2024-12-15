@@ -1,9 +1,11 @@
+import { UploadIconDTO } from '~/types/api-dto-types';
 import { BasePageData, ProjectVO, IconVO } from '~/types/api-vo-types';
 import request from '~/utils/request';
 
 export const API_PATH = {
   QUERY_PORJECTS: '/api/project/page-list',
   QUERY_PROJECT_ICONS: '/api/projects/:projectId/icons',
+  ADD_ICON: '/api/icon/add',
 };
 
 const queryPageProjects = async (
@@ -30,4 +32,8 @@ const queryProjectIcons = async (
   return result;
 };
 
-export default { queryPageProjects, queryProjectIcons };
+const addIcon = async (uploadIconDTO: UploadIconDTO) => {
+  return request.post(API_PATH.ADD_ICON, uploadIconDTO);
+};
+
+export default { queryPageProjects, queryProjectIcons, addIcon };
