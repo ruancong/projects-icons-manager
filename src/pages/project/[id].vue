@@ -21,8 +21,43 @@
 
     <!-- 项目详情内容区 -->
     <div class="p-6 bg-white rounded shadow-sm">
-      <h1>项目详情 - {{ projectId }}</h1>
-      <!-- 项目详情内容 -->
+      <h1 class="mb-4">项目详情 - {{ projectId }}</h1>
+
+      <!-- Icon列表表格 -->
+      <el-table :data="iconList" stripe style="width: 100%">
+        <el-table-column type="index" label="序号" width="80" />
+        <el-table-column prop="name" label="Icon名称" />
+        <el-table-column prop="ossPath" label="OSS路径" show-overflow-tooltip />
+        <el-table-column prop="version" label="当前版本号" width="120" />
+        <el-table-column label="操作" width="150">
+          <template #default="scope">
+            <el-button-group>
+              <el-button size="small" @click="handlePreview(scope.row)">
+                <el-icon><View /></el-icon>
+              </el-button>
+              <el-button size="small" type="primary" @click="handleIconEdit(scope.row)">
+                <el-icon><Edit /></el-icon>
+              </el-button>
+              <el-button size="small" type="danger" @click="handleIconDelete(scope.row)">
+                <el-icon><Delete /></el-icon>
+              </el-button>
+            </el-button-group>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 分页器 -->
+      <div class="flex justify-end mt-4">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
+          layout="total, sizes, prev, pager, next"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
     </div>
 
     <!-- 删除确认对话框 -->
@@ -39,9 +74,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Delete, Edit, More } from '@element-plus/icons-vue';
+import { Delete, Edit, More, View } from '@element-plus/icons-vue';
+import api from '~/api/api';
+import type { IconVO } from '~/types/api-vo-types';
 
 const route = useRoute<'/project/[id]'>();
 const router = useRouter();
@@ -65,4 +102,48 @@ const handleDelete = async () => {};
 const handleMore = () => {
   // 实现更多操作的逻辑
 };
+
+const iconList = ref<IconVO[]>([]);
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+
+// 获取图标列表
+const getIconList = async () => {
+  const response = await api.queryProjectIcons(projectId, currentPage.value, pageSize.value);
+  iconList.value = response.list;
+  total.value = response.total;
+};
+
+// 分页处理函数
+const handleSizeChange = (val: number) => {
+  pageSize.value = val;
+  getIconList();
+};
+
+const handleCurrentChange = (val: number) => {
+  currentPage.value = val;
+  getIconList();
+};
+
+// 图标操作函数
+const handlePreview = (row: IconVO) => {
+  // 实现预览逻辑
+  console.log('预览图标:', row);
+};
+
+const handleIconEdit = (row: IconVO) => {
+  // 实现编辑逻辑
+  console.log('编辑图标:', row);
+};
+
+const handleIconDelete = (row: IconVO) => {
+  // 实现删除逻辑
+  console.log('删除图标:', row);
+};
+
+// 页面加载时获取数据
+onMounted(() => {
+  getIconList();
+});
 </script>

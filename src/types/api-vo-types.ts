@@ -15,3 +15,10 @@ export interface ProjectVO {
   name: string;
   rootPath: string;
 }
+
+export interface IconVO {
+  id: number;
+  name: string;
+  ossPath: string;
+  version: string;
+}
