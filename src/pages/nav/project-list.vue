@@ -147,10 +147,10 @@ onMounted(() => {
 const fetchData = async () => {
   loading.value = true;
 
-  const dataList = await api.queryPageProjects(1, 10);
+  const dataList = await api.queryPageProjects(currentPage.value, pageSize.value);
 
-  tableData.value = dataList;
-  total.value = 100;
+  tableData.value = dataList.list;
+  total.value = dataList.total;
 
   loading.value = false;
 };

@@ -4,6 +4,7 @@ import { MyError } from '~/types/app-types';
 import { useGlobalMessage } from '~/composables/useGlobalMessage';
 import getEnv from './env';
 import { BaseResponse } from '~/types/api-vo-types';
+import { BusinessCodeEnum } from './constants';
 
 const { isShowGlobalLoading } = useGlobalLoading();
 
@@ -34,7 +35,7 @@ service.interceptors.response.use(
   function (response) {
     if (response.status === 200) {
       const serverData = response.data;
-      if (serverData.code !== '0') {
+      if (serverData.code !== BusinessCodeEnum.SUCCESS) {
         if (!notShowErrorMsg(serverData.code)) {
           const { error } = useGlobalMessage();
           error(serverData.message || '发生了点异常！');

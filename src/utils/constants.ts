@@ -1,5 +1,6 @@
 /**
  * 接口错误码
  */
-export enum ErrorCodeEnum {
+export enum BusinessCodeEnum {
+  SUCCESS = 200,
 }
