@@ -9,7 +9,7 @@ import { UploadIconDTO } from '~/types/api-dto-types';
 const randomDelay = () => delay(500 + Math.random() * 1000);
 
 // 模拟数据
-const mockProjectsList: ProjectVO[] = Array.from({ length: 87 }, (_, index) => ({
+const mockProjectsList: ProjectVO[] = Array.from({ length: 23 }, (_, index) => ({
   id: index + 1 + '',
   name: `项目${index + 1}`,
   rootPath: `/data/projects/project${index + 1}`,
@@ -51,7 +51,7 @@ export const handlers = [
     });
   }),
 
-  // 添加图标列表的 handler
+  // 项目图标列表的 handler
   http.get(`${BASE_API_URL}/api/projects/:projectId/icons`, async ({ request, params }) => {
     await randomDelay();
 
@@ -69,8 +69,8 @@ export const handlers = [
       code: BusinessCodeEnum.SUCCESS,
       data: {
         list: data,
-        total: mockProjectsList.length,
-        totalPages: Math.ceil(mockProjectsList.length / pageSize),
+        total: mockIconsList.length,
+        totalPages: Math.ceil(mockIconsList.length / pageSize),
       },
       msg: 'success',
     });
