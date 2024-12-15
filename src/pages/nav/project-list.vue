@@ -89,7 +89,6 @@ import { useRouter } from 'vue-router';
 import { useGlobalMessage } from '~/composables/useGlobalMessage';
 import { ProjectVO } from '~/types/api-vo-types';
 import api from '~/api/api';
-import { useGlobalLoading } from '~/composables/useGlobalLoading';
 
 // 1. 接口定义
 interface SearchFormState {
@@ -104,7 +103,6 @@ interface FormData {
 // 2. 变量声明
 const router = useRouter();
 const { success } = useGlobalMessage();
-const { isShowGlobalLoading } = useGlobalLoading();
 
 // 搜索相关
 const searchForm = reactive<SearchFormState>({
@@ -148,7 +146,6 @@ onMounted(() => {
 // 数据获取
 const fetchData = async () => {
   loading.value = true;
-  isShowGlobalLoading.value = true;
 
   const dataList = await api.queryPageProjects(currentPage.value, pageSize.value);
 
@@ -156,7 +153,6 @@ const fetchData = async () => {
   total.value = dataList.total;
 
   loading.value = false;
-  isShowGlobalLoading.value = false;
 };
 
 // 搜索相关方法

@@ -1,7 +1,4 @@
 $--colors: (
-  'primary': (
-    'base': green,
-  ),
   'success': (
     'base': #21ba45,
   ),
@@ -40,3 +37,17 @@ $--colors: (
 
 // custom dark variables
 @use './dark.scss';
+
+// 自定义 loading 颜色与主题色一致
+// 在 index.scss 中添加这段代码来测试
+.el-loading-spinner {
+  .circular {
+    .path {
+      stroke: var(--ep-color-primary);
+    }
+  }
+}
+
+.el-loading-text {
+  color: var(--ep-color-primary) !important;
+}
