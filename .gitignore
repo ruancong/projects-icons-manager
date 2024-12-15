@@ -12,7 +12,7 @@ package-lock.json
 
 *.log
 
-components.d.ts
-types.d.ts
+src/components.d.ts
+src/src/types.d.ts
 
 public/mockServiceWorker.js
