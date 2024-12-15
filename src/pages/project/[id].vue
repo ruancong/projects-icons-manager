@@ -4,16 +4,16 @@
     <div my-container>
       <div>
         <h3 class="mb-4 mt-0">项目：{{ projectName }}</h3>
-        <el-button type="primary" @click="handleEdit">
+        <el-button :disabled="true" type="primary" @click="handleEdit">
           <el-icon><Edit /></el-icon>
           编辑项目
         </el-button>
-        <el-button type="danger" @click="showDeleteConfirm">
+        <el-button :disabled="true" type="danger" @click="showDeleteConfirm">
           <el-icon><Delete /></el-icon>
           删除项目
         </el-button>
         <!-- 其他操作按钮 -->
-        <el-button @click="handleMore">
+        <el-button :disabled="true" @click="handleMore">
           <el-icon><More /></el-icon>
           更多操作
         </el-button>
@@ -63,7 +63,12 @@
                 <span>编辑</span>
                 <el-icon><Edit /></el-icon>
               </el-button>
-              <el-button size="small" type="danger" @click="handleIconDelete(scope.row)">
+              <el-button
+                :disabled="true"
+                size="small"
+                type="danger"
+                @click="handleIconDelete(scope.row)"
+              >
                 <span>删除</span>
                 <el-icon><Delete /></el-icon>
               </el-button>

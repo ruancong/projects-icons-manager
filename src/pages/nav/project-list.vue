@@ -7,7 +7,7 @@
           <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="handleSearch">查询</el-button>
+          <el-button :disabled="true" type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
@@ -18,7 +18,7 @@
     <div class="my-container">
       <h3 class="mb-4 mt-0">项目列表</h3>
       <div mb-2>
-        <el-button type="primary" @click="handleAdd">新增</el-button>
+        <el-button :disabled="true" type="primary" @click="handleAdd">新增</el-button>
       </div>
 
       <!-- 表格区域 -->
