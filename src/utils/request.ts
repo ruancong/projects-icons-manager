@@ -10,7 +10,7 @@ const { isShowGlobalLoading } = useGlobalLoading();
 
 // 不显示错误提示的码
 const NOT_SHOW_ERROR_CODES: string[] = [];
-const { BASE_URL } = getEnv();
+const { BASE_API_URL } = getEnv();
 
 const service = axios.create({
   headers: {
@@ -22,7 +22,7 @@ const service = axios.create({
 // 添加请求拦截器
 service.interceptors.request.use(
   function (config) {
-    config.baseURL = BASE_URL;
+    config.baseURL = BASE_API_URL;
     return config;
   },
   function (error) {

@@ -14,10 +14,10 @@ const mockProjects: ProjectVO[] = Array.from({ length: 87 }, (_, index) => ({
   rootPath: `/data/projects/project${index + 1}`,
 }));
 
-const { BASE_URL } = getEnv();
+const { BASE_API_URL } = getEnv();
 
 export const handlers = [
-  http.get(`${BASE_URL}${API_PATH.QUERY_PORJECTS}`, async ({ request }) => {
+  http.get(`${BASE_API_URL}${API_PATH.QUERY_PORJECTS}`, async ({ request }) => {
     await randomDelay(); // 使用随机延迟
 
     const url = new URL(request.url);
