@@ -9,14 +9,15 @@
   },
   "scripts": {
     "dev": "vite",
-    "dev-mock": "msw init public/ --save && vite",
-    "build": "run-p type-check \"build-mock {@}\" --",
-    "build-mock": "msw init public/ --save && run-p type-check \"build-only {@}\" --",
+    "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc  --noEmit",
     "lint": "eslint . --fix",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "prepare": "msw init public/ --save",
+    "prebuild": "msw init public/ --save",
+    "predev": "msw init public/ --save"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
