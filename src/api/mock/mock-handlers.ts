@@ -2,6 +2,7 @@ import { http, HttpResponse, delay } from 'msw';
 import { BasePageData, BaseResponse, ProjectVO } from '~/types/api-vo-types';
 import { API_PATH } from '../api';
 import { BusinessCodeEnum } from '~/utils/constants';
+import getEnv from '~/utils/env';
 
 // 添加随机延迟函数
 const randomDelay = () => delay(500 + Math.random() * 1000);
@@ -13,8 +14,10 @@ const mockProjects: ProjectVO[] = Array.from({ length: 87 }, (_, index) => ({
   rootPath: `/data/projects/project${index + 1}`,
 }));
 
+const { BASE_URL } = getEnv();
+
 export const handlers = [
-  http.get(API_PATH.QUERY_PORJECTS, async ({ request }) => {
+  http.get(`${BASE_URL}${API_PATH.QUERY_PORJECTS}`, async ({ request }) => {
     await randomDelay(); // 使用随机延迟
 
     const url = new URL(request.url);
