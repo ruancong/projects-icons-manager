@@ -120,6 +120,33 @@
             fit="contain"
           />
         </el-form-item>
+
+        <!-- 添加历史版本选择 -->
+        <el-form-item v-if="isEdit" label="历史版本:">
+          <el-radio-group v-model="selectedVersion" @change="handleVersionChange">
+            <el-radio-button 
+              v-for="history in iconHistory" 
+              :key="history.id" 
+              :label="history.version"
+            >
+              v{{ history.version }}
+            </el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+
+        <!-- 添加历史版本预览 -->
+        <el-form-item v-if="isEdit && selectedHistoryIcon" label="历史版本预览:">
+          <el-image
+            :src="selectedHistoryIcon.fullOssPath"
+            :preview-src-list="[selectedHistoryIcon.fullOssPath]"
+            class="w-10 h-10"
+            fit="contain"
+          />
+          <div class="text-xs text-gray-500 mt-1">
+            创建时间: {{ new Date(selectedHistoryIcon.createTime).toLocaleString() }}
+          </div>
+        </el-form-item>
+
         <el-form-item :label="isEdit ? '新icon文件' : 'icon文件'" prop="file">
           <el-upload
             ref="uploadRef"
@@ -152,11 +179,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Delete, Edit, More, CopyDocument, Picture } from '@element-plus/icons-vue';
 import api from '~/api/api';
-import type { IconVO } from '~/types/api-vo-types';
+import type { IconVO, IconHistoryVO } from '~/types/api-vo-types';
 import { ElMessage } from 'element-plus';
 import { useClipboard } from '@vueuse/core';
 import type { FormInstance, UploadFile, UploadInstance } from 'element-plus';
@@ -258,13 +285,24 @@ const handleAddIcon = () => {
 };
 
 // 编辑方法
-const handleIconEdit = (row: IconVO) => {
+const handleIconEdit = async (row: IconVO) => {
   isEdit.value = true;
   currentEditIconVO.value = row;
   iconForm.value = {
     name: row.name,
     file: null,
   };
+  
+  // 加载历史版本
+  try {
+    const historyData = await api.queryIconHistory(row.id);
+    iconHistory.value = historyData;
+    selectedVersion.value = row.version; // 默认选中当前版本
+  } catch (error) {
+    console.error('Failed to load icon history:', error);
+    ElMessage.error('加载历史版本失败');
+  }
+  
   iconFormRef.value?.clearValidate();
   iconDialogVisible.value = true;
 };
@@ -332,10 +370,30 @@ function uploadToOss(file: File | null) {
   if (file) {
     formData.append('file', file);
     // todo 上传文件到oss , 获取ossPath
-    // 随机生��一个8位字符串作为文件名
+    // 随机生成一个8位字符串作为文件名
     const ossPath = Math.random().toString(36).substring(2, 15);
     return ossPath;
   }
   return '';
 }
+
+// 添加历史版本相关的响应式变量
+const iconHistory = ref<IconHistoryVO[]>([]);
+const selectedVersion = ref<number>();
+const selectedHistoryIcon = computed(() => 
+  iconHistory.value.find(h => h.version === selectedVersion.value)
+);
+
+// 处理版本切换
+const handleVersionChange = (version: number) => {
+  selectedVersion.value = version;
+};
+
+// 关闭弹窗时清理历史版本数据
+watch(iconDialogVisible, (newVal) => {
+  if (!newVal) {
+    iconHistory.value = [];
+    selectedVersion.value = undefined;
+  }
+});
 </script>

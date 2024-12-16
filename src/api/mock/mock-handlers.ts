@@ -1,5 +1,5 @@
 import { http, HttpResponse, delay } from 'msw';
-import { BasePageData, BaseResponse, ProjectVO, IconVO } from '~/types/api-vo-types';
+import { BasePageData, BaseResponse, ProjectVO, IconVO, IconHistoryVO } from '~/types/api-vo-types';
 import { API_PATH } from '../api';
 import { BusinessCodeEnum } from '~/utils/constants';
 import getEnv from '~/utils/env';
@@ -25,6 +25,17 @@ const mockIconsList: IconVO[] = Array.from({ length: 38 }, (_, index) => ({
   fullOssPath: `https://robohash.org/${projectId}-${index + 1}.png?size=40x40`,
   version: 1,
 }));
+
+// 添加模拟的历史版本数据生成函数
+const generateMockIconHistory = (iconId: string): IconHistoryVO[] => {
+  const versions = Array.from({ length: 3 }, (_, index) => ({
+    id: `${iconId}-history-${index + 1}`,
+    version: index + 1,
+    fullOssPath: `https://robohash.org/${iconId}-v${index + 1}?size=40x40`,
+    createTime: new Date(Date.now() - index * 24 * 60 * 60 * 1000).toISOString(),
+  }));
+  return versions.reverse(); // 返回倒序，最新的在最前
+};
 
 const { BASE_API_URL } = getEnv();
 
@@ -52,7 +63,7 @@ export const handlers = [
   }),
 
   // 项目图标列表的 handler
-  http.get(`${BASE_API_URL}/api/projects/:projectId/icons`, async ({ request, params }) => {
+  http.get(`${BASE_API_URL}${API_PATH.QUERY_PROJECT_ICONS}`, async ({ request, params }) => {
     await randomDelay();
 
     const url = new URL(request.url);
@@ -121,6 +132,19 @@ export const handlers = [
     return HttpResponse.json<BaseResponse<null>>({
       code: BusinessCodeEnum.SUCCESS,
       data: null,
+      msg: 'success',
+    });
+  }),
+
+  // 添加查询图标历史版本的 handler
+  http.get(`${BASE_API_URL}${API_PATH.QUERY_ICON_HISTORY}`, async ({ request, params }) => {
+    await randomDelay();
+    const iconId = params.iconId as string;
+    const historyData = generateMockIconHistory(iconId);
+
+    return HttpResponse.json<BaseResponse<IconHistoryVO[]>>({
+      code: BusinessCodeEnum.SUCCESS,
+      data: historyData,
       msg: 'success',
     });
   }),

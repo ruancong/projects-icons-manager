@@ -1,5 +1,5 @@
 import { UploadIconDTO } from '~/types/api-dto-types';
-import { BasePageData, ProjectVO, IconVO } from '~/types/api-vo-types';
+import { BasePageData, ProjectVO, IconVO, IconHistoryVO } from '~/types/api-vo-types';
 import request from '~/utils/request';
 
 export const API_PATH = {
@@ -7,6 +7,7 @@ export const API_PATH = {
   QUERY_PROJECT_ICONS: '/api/projects/:projectId/icons',
   ADD_ICON: '/api/icon/add',
   UPDATE_ICON: '/api/icon/update',
+  QUERY_ICON_HISTORY: '/api/icon/:iconId/history',
 };
 
 const queryPageProjects = async (
@@ -41,4 +42,11 @@ const updateIcon = async (uploadIconDTO: UploadIconDTO) => {
   return request.post(API_PATH.UPDATE_ICON, uploadIconDTO);
 };
 
-export default { queryPageProjects, queryProjectIcons, addIcon, updateIcon };
+const queryIconHistory = async (iconId: string): Promise<IconHistoryVO[]> => {
+  const result = await request.getWithPathParams<IconHistoryVO[]>(API_PATH.QUERY_ICON_HISTORY, {
+    iconId,
+  });
+  return result;
+};
+
+export default { queryPageProjects, queryProjectIcons, addIcon, updateIcon, queryIconHistory };

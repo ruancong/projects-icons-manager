@@ -22,3 +22,10 @@ export interface IconVO {
   fullOssPath: string;
   version: number;
 }
+
+export interface IconHistoryVO {
+  id: string;
+  version: number;
+  fullOssPath: string;
+  createTime: string;
+}
