@@ -123,15 +123,16 @@
 
         <!-- 添加历史版本选择 -->
         <el-form-item v-if="isEdit" label="历史版本:">
-          <el-radio-group v-model="selectedVersion" @change="handleVersionChange">
-            <el-radio-button 
-              v-for="history in iconHistory" 
-              :key="history.id" 
-              :label="history.version"
+          <div class="flex gap-2">
+            <el-check-tag
+              v-for="history in iconHistory"
+              :key="history.id"
+              :checked="selectedVersion === history.version"
+              @change="() => handleVersionChange(history.version)"
             >
               v{{ history.version }}
-            </el-radio-button>
-          </el-radio-group>
+            </el-check-tag>
+          </div>
         </el-form-item>
 
         <!-- 添加历史版本预览 -->
@@ -292,17 +293,17 @@ const handleIconEdit = async (row: IconVO) => {
     name: row.name,
     file: null,
   };
-  
+
   // 加载历史版本
   try {
     const historyData = await api.queryIconHistory(row.id);
-    iconHistory.value = historyData;
+    iconHistory.value = historyData.sort((a, b) => a.version - b.version);
     selectedVersion.value = row.version; // 默认选中当前版本
   } catch (error) {
     console.error('Failed to load icon history:', error);
     ElMessage.error('加载历史版本失败');
   }
-  
+
   iconFormRef.value?.clearValidate();
   iconDialogVisible.value = true;
 };
@@ -380,8 +381,8 @@ function uploadToOss(file: File | null) {
 // 添加历史版本相关的响应式变量
 const iconHistory = ref<IconHistoryVO[]>([]);
 const selectedVersion = ref<number>();
-const selectedHistoryIcon = computed(() => 
-  iconHistory.value.find(h => h.version === selectedVersion.value)
+const selectedHistoryIcon = computed(() =>
+  iconHistory.value.find((h) => h.version === selectedVersion.value),
 );
 
 // 处理版本切换
