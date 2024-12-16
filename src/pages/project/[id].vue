@@ -32,7 +32,7 @@
       <el-table border v-loading="tableLoading" :data="iconList" stripe style="width: 100%">
         <el-table-column type="index" label="序号" width="80" />
         <el-table-column prop="name" label="Icon名称" width="120" />
-        <el-table-column prop="ossPath" label="OSS路径" min-width="380" show-overflow-tooltip>
+        <el-table-column prop="ossPath" label="OSS路径" min-width="300" show-overflow-tooltip>
           <template #default="{ row }: { row: IconVO }">
             <div class="flex items-center gap-2">
               <el-button size="small" link @click="copyToClipboard(row.name, row.fullOssPath)">
