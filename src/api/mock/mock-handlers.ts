@@ -3,7 +3,7 @@ import { BasePageData, BaseResponse, ProjectVO, IconVO, IconHistoryVO } from '~/
 import { API_PATH } from '../api';
 import { BusinessCodeEnum } from '~/utils/constants';
 import getEnv from '~/utils/env';
-import { UploadIconDTO } from '~/types/api-dto-types';
+import { RollbackIconDTO, UploadIconDTO } from '~/types/api-dto-types';
 
 // 添加随机延迟函数
 const randomDelay = () => delay(500 + Math.random() * 1000);
@@ -137,7 +137,7 @@ export const handlers = [
   }),
 
   // 添加查询图标历史版本的 handler
-  http.get(`${BASE_API_URL}${API_PATH.QUERY_ICON_HISTORY}`, async ({ request, params }) => {
+  http.get(`${BASE_API_URL}${API_PATH.QUERY_ICON_HISTORY}`, async ({ params }) => {
     await randomDelay();
     const iconId = params.iconId as string;
     const historyData = generateMockIconHistory(iconId);
@@ -145,6 +145,29 @@ export const handlers = [
     return HttpResponse.json<BaseResponse<IconHistoryVO[]>>({
       code: BusinessCodeEnum.SUCCESS,
       data: historyData,
+      msg: 'success',
+    });
+  }),
+
+  // 添加版本回退的 handler
+  http.post(`${BASE_API_URL}${API_PATH.ROLLBACK_ICON}`, async ({ request }) => {
+    await randomDelay();
+
+    const rollbackIconDTO = (await request.json()) as RollbackIconDTO;
+    
+    // 在 mock 数据中查找并更新图标
+    const iconIndex = mockIconsList.findIndex((icon) => icon.id === rollbackIconDTO.id);
+    if (iconIndex !== -1) {
+      // 模拟回退操作，将版本号更新为回退的版本
+      mockIconsList[iconIndex] = {
+        ...mockIconsList[iconIndex],
+        version: rollbackIconDTO.version,
+      };
+    }
+
+    return HttpResponse.json<BaseResponse<null>>({
+      code: BusinessCodeEnum.SUCCESS,
+      data: null,
       msg: 'success',
     });
   }),

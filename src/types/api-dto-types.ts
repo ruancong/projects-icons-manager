@@ -4,3 +4,8 @@ export interface UploadIconDTO {
   ossPath?: string;
   id?: string;
 }
+
+export interface RollbackIconDTO {
+  id: string;
+  version: number;
+}

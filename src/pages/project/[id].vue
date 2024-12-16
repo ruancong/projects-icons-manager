@@ -440,21 +440,13 @@ const handleShowHistory = async (row: IconVO) => {
 const handleRollback = async () => {
   if (!selectedHistoryIcon.value || !currentEditIconVO.value) return;
 
-  try {
-    const uploadIconDTO: UploadIconDTO = {
-      id: currentEditIconVO.value.id,
-      name: currentEditIconVO.value.name,
-      projectId: projectId,
-      ossPath: selectedHistoryIcon.value.fullOssPath,
-    };
-
-    await api.updateIcon(uploadIconDTO);
-    ElMessage.success('版本回退成功');
-    historyDialogVisible.value = false;
-    getIconList(); // 刷新列表
-  } catch (error) {
-    console.error('Failed to rollback version:', error);
-    ElMessage.error('版本回退失败');
-  }
+  await api.rollbackIcon({
+    id: currentEditIconVO.value.id,
+    version: selectedHistoryIcon.value.version
+  });
+  
+  ElMessage.success('版本回退成功');
+  historyDialogVisible.value = false;
+  getIconList(); // 刷新列表
 };
 </script>
