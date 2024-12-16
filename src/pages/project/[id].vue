@@ -71,7 +71,7 @@
                 <span>历史版本</span>
                 <el-icon><Timer /></el-icon>
               </el-button>
-              <el-button :disabled="true" size="small" type="danger" @click="handleIconDelete(row)">
+              <el-button size="small" type="danger" @click="handleIconDeleteConfirm(row)">
                 <span>删除</span>
                 <el-icon><Delete /></el-icon>
               </el-button>
@@ -195,6 +195,17 @@
           >
             回退到此版本
           </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- 删除 Icon 确认对话框 -->
+    <el-dialog v-model="deleteIconDialogVisible" title="确认删除" width="30%">
+      <span>确定要删除icon: {{ currentDeleteIcon?.name }} 吗？此操作不可恢复。</span>
+      <template #footer>
+        <span class="flex justify-end gap-3">
+          <el-button @click="deleteIconDialogVisible = false">取消</el-button>
+          <el-button type="danger" @click="handleIconDelete">确定删除</el-button>
         </span>
       </template>
     </el-dialog>
@@ -372,10 +383,23 @@ const handleIconSubmit = async () => {
   });
 };
 
+const deleteIconDialogVisible = ref(false);
+const currentDeleteIcon = ref<IconVO | null>(null);
+
+// 显示删除确认框
+const handleIconDeleteConfirm = (row: IconVO) => {
+  currentDeleteIcon.value = row;
+  deleteIconDialogVisible.value = true;
+};
+
 // 删除图标
-const handleIconDelete = (row: IconVO) => {
-  // 实现删除逻辑
-  console.log('删除图标:', row);
+const handleIconDelete = async () => {
+  if (!currentDeleteIcon.value) return;
+  await api.deleteIcon(currentDeleteIcon.value.id);
+  ElMessage.success('删除成功');
+  // 刷新列表
+  await getIconList();
+  deleteIconDialogVisible.value = false;
 };
 
 // 修改复制函数
@@ -442,9 +466,9 @@ const handleRollback = async () => {
 
   await api.rollbackIcon({
     id: currentEditIconVO.value.id,
-    version: selectedHistoryIcon.value.version
+    version: selectedHistoryIcon.value.version,
   });
-  
+
   ElMessage.success('版本回退成功');
   historyDialogVisible.value = false;
   getIconList(); // 刷新列表

@@ -171,4 +171,22 @@ export const handlers = [
       msg: 'success',
     });
   }),
+
+  // 添加删除图标的 handler
+  http.post(`${BASE_API_URL}${API_PATH.DELETE_ICON}`, async ({ params }) => {
+    await randomDelay();
+
+    const iconId = params.iconId as string;
+    // 在 mock 数据中查找并删除图标
+    const iconIndex = mockIconsList.findIndex((icon) => icon.id === iconId);
+    if (iconIndex !== -1) {
+      mockIconsList.splice(iconIndex, 1);
+    }
+
+    return HttpResponse.json<BaseResponse<null>>({
+      code: BusinessCodeEnum.SUCCESS,
+      data: null,
+      msg: 'success',
+    });
+  }),
 ];

@@ -9,6 +9,7 @@ export const API_PATH = {
   UPDATE_ICON: '/api/icon/update',
   QUERY_ICON_HISTORY: '/api/icon/:iconId/history',
   ROLLBACK_ICON: '/api/icon/rollback',
+  DELETE_ICON: '/api/icon/delete/:iconId',
 };
 
 const queryPageProjects = async (
@@ -27,8 +28,10 @@ const queryProjectIcons = async (
   page: number,
   pageSize: number,
 ): Promise<BasePageData<IconVO>> => {
-  const url = API_PATH.QUERY_PROJECT_ICONS.replace(':projectId', projectId);
-  const result = await request.get<BasePageData<IconVO>>(url, {
+  const url = API_PATH.QUERY_PROJECT_ICONS;
+  const result = await request.getWithPathParams<BasePageData<IconVO>>(url, {
+    projectId,
+  }, {
     page,
     pageSize,
   });
@@ -54,4 +57,16 @@ const rollbackIcon = async (rollbackIconDTO: RollbackIconDTO) => {
   return request.post(API_PATH.ROLLBACK_ICON, rollbackIconDTO);
 };
 
-export default { queryPageProjects, queryProjectIcons, addIcon, updateIcon, queryIconHistory, rollbackIcon };
+const deleteIcon = async (iconId: string) => {
+  return request.postWithPathParams(API_PATH.DELETE_ICON, { iconId });
+};
+
+export default {
+  queryPageProjects,
+  queryProjectIcons,
+  addIcon,
+  updateIcon,
+  queryIconHistory,
+  rollbackIcon,
+  deleteIcon,
+};

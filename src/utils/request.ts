@@ -74,7 +74,7 @@ function processUrl(
   let finalUrl = url;
   if (pathParams) {
     Object.entries(pathParams).forEach(([key, value]) => {
-      finalUrl = finalUrl.replace(`{${key}}`, String(value));
+      finalUrl = finalUrl.replace(`:${key}`, String(value));
     });
   }
 
