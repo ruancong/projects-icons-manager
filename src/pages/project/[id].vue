@@ -32,7 +32,7 @@
       <el-table border v-loading="tableLoading" :data="iconList" stripe style="width: 100%">
         <el-table-column type="index" label="序号" width="80" />
         <el-table-column prop="name" label="Icon名称" width="120" />
-        <el-table-column prop="ossPath" label="OSS路径" min-width="600" show-overflow-tooltip>
+        <el-table-column prop="ossPath" label="OSS路径" min-width="380" show-overflow-tooltip>
           <template #default="{ row }: { row: IconVO }">
             <div class="flex items-center gap-2">
               <el-button size="small" link @click="copyToClipboard(row.name, row.fullOssPath)">
@@ -55,20 +55,23 @@
             </el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="version" label="当前版本号" width="120" />
+        <el-table-column prop="version" label="当前版本号" width="120">
+          <template #default="{ row }: { row: IconVO }">
+            <span>v{{ row.version }}</span>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" label="操作" min-width="180">
-          <template #default="scope">
+          <template #default="{ row }: { row: IconVO }">
             <div>
-              <el-button size="small" type="primary" @click="handleIconEdit(scope.row)">
+              <el-button size="small" type="primary" @click="handleIconEdit(row)">
                 <span>编辑</span>
                 <el-icon><Edit /></el-icon>
               </el-button>
-              <el-button
-                :disabled="true"
-                size="small"
-                type="danger"
-                @click="handleIconDelete(scope.row)"
-              >
+              <el-button size="small" @click="handleShowHistory(row)">
+                <span>历史版本</span>
+                <el-icon><Timer /></el-icon>
+              </el-button>
+              <el-button :disabled="true" size="small" type="danger" @click="handleIconDelete(row)">
                 <span>删除</span>
                 <el-icon><Delete /></el-icon>
               </el-button>
@@ -108,9 +111,6 @@
         <el-form-item label="icon名称" prop="name">
           <el-input v-model="iconForm.name" placeholder="请输入icon名称" />
         </el-form-item>
-        <el-form-item v-if="isEdit" label="icon版本:">
-          <span>{{ currentEditIconVO?.version }}</span>
-        </el-form-item>
         <el-form-item v-if="isEdit" label="icon预览:">
           <el-image
             v-if="currentEditIconVO"
@@ -119,36 +119,6 @@
             class="w-10 h-10"
             fit="contain"
           />
-        </el-form-item>
-
-        <!-- 添加历史版本选择 -->
-        <el-form-item v-if="isEdit" label="历史版本:">
-          <div class="flex gap-2">
-            <el-check-tag
-              v-for="history in iconHistory"
-              :key="history.id"
-              :checked="selectedVersion === history.version"
-              @change="() => handleVersionChange(history.version)"
-              :class="{
-                '!text-gray-500 !bg-gray-100 !border-gray-200': selectedVersion !== history.version,
-              }"
-            >
-              v{{ history.version }}
-            </el-check-tag>
-          </div>
-        </el-form-item>
-
-        <!-- 历史版本预览 -->
-        <el-form-item v-if="isEdit && selectedHistoryIcon" label="历史版本预览:">
-          <el-image
-            :src="selectedHistoryIcon.fullOssPath"
-            :preview-src-list="[selectedHistoryIcon.fullOssPath]"
-            class="w-10 h-10"
-            fit="contain"
-          />
-          <div class="text-xs text-gray-500 mt-1">
-            创建时间: {{ new Date(selectedHistoryIcon.createTime).toLocaleString() }}
-          </div>
         </el-form-item>
 
         <el-form-item :label="isEdit ? '新icon文件' : 'icon文件'" prop="file">
@@ -179,13 +149,62 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 历史版本弹窗 -->
+    <el-dialog v-model="historyDialogVisible" title="历史版本" width="500px">
+      <el-form label-width="120px">
+        <el-form-item label="当前版本:">
+          <span>v{{ currentEditIconVO?.version }}</span>
+        </el-form-item>
+
+        <el-form-item label="历史版本:">
+          <div class="flex gap-2">
+            <el-check-tag
+              v-for="history in iconHistory"
+              :key="history.id"
+              :checked="selectedVersion === history.version"
+              @change="() => handleVersionChange(history.version)"
+              :class="{
+                '!text-gray-500 !bg-gray-100 !border-gray-200': selectedVersion !== history.version,
+              }"
+            >
+              v{{ history.version }}
+            </el-check-tag>
+          </div>
+        </el-form-item>
+
+        <el-form-item v-if="selectedHistoryIcon" label="历史版本预览:">
+          <el-image
+            :src="selectedHistoryIcon.fullOssPath"
+            :preview-src-list="[selectedHistoryIcon.fullOssPath]"
+            class="w-10 h-10"
+            fit="contain"
+          />
+          <div class="text-xs text-gray-500 mt-1">
+            创建时间: {{ new Date(selectedHistoryIcon.createTime).toLocaleString() }}
+          </div>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="historyDialogVisible = false">取消</el-button>
+          <el-button
+            type="primary"
+            @click="handleRollback"
+            :disabled="!selectedVersion || selectedVersion === currentEditIconVO?.version"
+          >
+            回退到此版本
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Delete, Edit, More, CopyDocument, Picture } from '@element-plus/icons-vue';
+import { Delete, Edit, More, CopyDocument, Picture, Timer } from '@element-plus/icons-vue';
 import api from '~/api/api';
 import type { IconVO, IconHistoryVO } from '~/types/api-vo-types';
 import { ElMessage } from 'element-plus';
@@ -246,6 +265,7 @@ const handleCurrentChange = (val: number) => {
 };
 
 const iconDialogVisible = ref(false);
+const historyDialogVisible = ref(false);
 const isEdit = ref(false);
 const currentEditIconVO = ref<IconVO | null>(null);
 
@@ -400,4 +420,41 @@ watch(iconDialogVisible, (newVal) => {
     selectedVersion.value = undefined;
   }
 });
+
+// 显示历史版本弹窗
+const handleShowHistory = async (row: IconVO) => {
+  currentEditIconVO.value = row;
+
+  try {
+    const historyData = await api.queryIconHistory(row.id);
+    iconHistory.value = historyData.sort((a, b) => a.version - b.version);
+    selectedVersion.value = row.version; // 默认选中当前版本
+    historyDialogVisible.value = true;
+  } catch (error) {
+    console.error('Failed to load icon history:', error);
+    ElMessage.error('加载历史版本失败');
+  }
+};
+
+// 处理版本回退
+const handleRollback = async () => {
+  if (!selectedHistoryIcon.value || !currentEditIconVO.value) return;
+
+  try {
+    const uploadIconDTO: UploadIconDTO = {
+      id: currentEditIconVO.value.id,
+      name: currentEditIconVO.value.name,
+      projectId: projectId,
+      ossPath: selectedHistoryIcon.value.fullOssPath,
+    };
+
+    await api.updateIcon(uploadIconDTO);
+    ElMessage.success('版本回退成功');
+    historyDialogVisible.value = false;
+    getIconList(); // 刷新列表
+  } catch (error) {
+    console.error('Failed to rollback version:', error);
+    ElMessage.error('版本回退失败');
+  }
+};
 </script>
