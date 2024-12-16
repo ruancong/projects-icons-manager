@@ -31,14 +31,14 @@
       <!-- Icon列表表格 -->
       <el-table border v-loading="tableLoading" :data="iconList" stripe style="width: 100%">
         <el-table-column type="index" label="序号" width="80" />
-        <el-table-column prop="name" label="Icon名称" />
-        <el-table-column prop="ossPath" label="OSS路径" show-overflow-tooltip>
+        <el-table-column prop="name" label="Icon名称" width="120" />
+        <el-table-column prop="ossPath" label="OSS路径" min-width="600" show-overflow-tooltip>
           <template #default="{ row }: { row: IconVO }">
             <div class="flex items-center gap-2">
-              <span>{{ row.fullOssPath }}</span>
               <el-button size="small" link @click="copyToClipboard(row.name, row.fullOssPath)">
                 <el-icon><CopyDocument /></el-icon>
               </el-button>
+              <span>{{ row.fullOssPath }}</span>
             </div>
           </template>
         </el-table-column>
@@ -56,7 +56,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="version" label="当前版本号" width="120" />
-        <el-table-column label="操作">
+        <el-table-column fixed="right" label="操作" min-width="180">
           <template #default="scope">
             <div>
               <el-button size="small" type="primary" @click="handleIconEdit(scope.row)">
@@ -102,13 +102,16 @@
       </template>
     </el-dialog>
 
-    <!-- 新增 Icon 弹窗表单 -->
-    <el-dialog v-model="iconDialogVisible" :title="isEdit ? '编辑Icon' : '新增Icon'" width="500px">
-      <el-form ref="iconFormRef" :model="iconForm" :rules="iconFormRules" label-width="100px">
-        <el-form-item label="Icon名称" prop="name">
-          <el-input v-model="iconForm.name" placeholder="请输入Icon名称" />
+    <!-- 新增与编辑 Icon 弹窗表单 -->
+    <el-dialog v-model="iconDialogVisible" :title="isEdit ? '编辑icon' : '新增icon'" width="500px">
+      <el-form ref="iconFormRef" :model="iconForm" :rules="iconFormRules" label-width="120px">
+        <el-form-item label="icon名称" prop="name">
+          <el-input v-model="iconForm.name" placeholder="请输入icon名称" />
         </el-form-item>
-        <el-form-item v-if="isEdit" label="原Icon预览">
+        <el-form-item v-if="isEdit" label="icon版本:">
+          <span>{{ currentEditIconVO?.version }}</span>
+        </el-form-item>
+        <el-form-item v-if="isEdit" label="icon预览:">
           <el-image
             v-if="currentEditIconVO"
             :src="currentEditIconVO.fullOssPath"
@@ -117,7 +120,7 @@
             fit="contain"
           />
         </el-form-item>
-        <el-form-item label="Icon文件" prop="file">
+        <el-form-item :label="isEdit ? '新icon文件' : 'icon文件'" prop="file">
           <el-upload
             ref="uploadRef"
             class="upload-demo"
