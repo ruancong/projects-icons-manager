@@ -129,13 +129,16 @@
               :key="history.id"
               :checked="selectedVersion === history.version"
               @change="() => handleVersionChange(history.version)"
+              :class="{
+                '!text-gray-500 !bg-gray-100 !border-gray-200': selectedVersion !== history.version,
+              }"
             >
               v{{ history.version }}
             </el-check-tag>
           </div>
         </el-form-item>
 
-        <!-- 添加历史版本预览 -->
+        <!-- 历史版本预览 -->
         <el-form-item v-if="isEdit && selectedHistoryIcon" label="历史版本预览:">
           <el-image
             :src="selectedHistoryIcon.fullOssPath"
