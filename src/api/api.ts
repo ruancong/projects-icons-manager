@@ -32,6 +32,7 @@ const queryProjectIcons = async (
   projectId: string,
   page: number,
   pageSize: number,
+  name?: string,
 ): Promise<BasePageData<IconVO>> => {
   const url = API_PATH.QUERY_PROJECT_ICONS;
   const result = await request.getWithPathParams<BasePageData<IconVO>>(url, {
@@ -39,6 +40,7 @@ const queryProjectIcons = async (
   }, {
     page,
     pageSize,
+    name,
   });
   return result;
 };

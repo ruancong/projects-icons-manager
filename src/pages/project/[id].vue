@@ -4,6 +4,14 @@
     <div my-container>
       <div>
         <h3 class="mb-4 mt-0">项目：{{ projectName }}</h3>
+        <div class="mb-4 flex gap-2">
+          <el-input v-model="searchName" placeholder="请输入icon名称搜索" class="!w-60" clearable>
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+          <el-button type="primary" @click="handleSearch">搜索</el-button>
+        </div>
       </div>
     </div>
 
@@ -193,11 +201,11 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Delete, Edit, More, CopyDocument, Picture, Timer } from '@element-plus/icons-vue';
+import { Delete, Edit, More, CopyDocument, Picture, Timer, Search } from '@element-plus/icons-vue';
 import api from '~/api/api';
 import type { IconVO, IconHistoryVO } from '~/types/api-vo-types';
 import { ElMessage } from 'element-plus';
-import { useClipboard } from '@vueuse/core';
+import { useClipboard, useDebounceFn } from '@vueuse/core';
 import type { FormInstance, UploadFile, UploadInstance } from 'element-plus';
 import { UploadIconDTO } from '~/types/api-dto-types';
 
@@ -214,10 +222,17 @@ const pageSize = ref(10);
 const total = ref(0);
 const tableLoading = ref(false);
 
+const searchName = ref('');
+
 // 获取图标列表
 const getIconList = async () => {
   tableLoading.value = true;
-  const response = await api.queryProjectIcons(projectId, currentPage.value, pageSize.value);
+  const response = await api.queryProjectIcons(
+    projectId,
+    currentPage.value,
+    pageSize.value,
+    searchName.value,
+  );
   iconList.value = response.list;
   total.value = response.total;
   tableLoading.value = false;
@@ -309,7 +324,7 @@ const handleIconSubmit = async () => {
     if (valid) {
       submitLoading.value = true;
 
-      // todo 上传文件��oss , 获取ossPath
+      // todo 上传文件到oss , 获取ossPath
       const uploadOssPath = await uploadToOss(iconForm.value.file);
 
       const uploadIconDTO: UploadIconDTO = {
@@ -411,7 +426,7 @@ const handleShowHistory = async (row: IconVO) => {
   try {
     const historyData = await api.queryIconHistory(row.id);
     iconHistory.value = historyData.sort((a, b) => a.version - b.version);
-    selectedVersion.value = row.version; // 默认选中当前版本
+    selectedVersion.value = row.version; // 默认选中当前版��
     historyDialogVisible.value = true;
   } catch (error) {
     console.error('Failed to load icon history:', error);
@@ -431,5 +446,11 @@ const handleRollback = async () => {
   ElMessage.success('版本回退成功');
   historyDialogVisible.value = false;
   getIconList(); // 刷新列表
+};
+
+// 处理搜索
+const handleSearch = () => {
+  currentPage.value = 1;
+  getIconList();
 };
 </script>

@@ -79,19 +79,28 @@ export const handlers = [
     const url = new URL(request.url);
     const page = Number(url.searchParams.get('page')) || 1;
     const pageSize = Number(url.searchParams.get('pageSize')) || 10;
+    const name = url.searchParams.get('name');
     const projectId = params.projectId as string;
     console.log('projectId', projectId);
 
+    // Filter icons by name if search parameter is provided
+    let filteredIcons = mockIconsList;
+    if (name) {
+      filteredIcons = mockIconsList.filter(icon =>
+        icon.name.toLowerCase().includes(name.toLowerCase())
+      );
+    }
+
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    const data = mockIconsList.slice(start, end);
+    const data = filteredIcons.slice(start, end);
 
     return HttpResponse.json<BaseResponse<BasePageData<IconVO>>>({
       code: BusinessCodeEnum.SUCCESS,
       data: {
         list: data,
-        total: mockIconsList.length,
-        totalPages: Math.ceil(mockIconsList.length / pageSize),
+        total: filteredIcons.length,
+        totalPages: Math.ceil(filteredIcons.length / pageSize),
       },
       msg: 'success',
     });
@@ -187,7 +196,7 @@ export const handlers = [
     await randomDelay();
 
     const iconId = params.iconId as string;
-    // 在 mock 数据中查找并删除图���
+    // 在 mock 数据中查找并删除图标
     const iconIndex = mockIconsList.findIndex((icon) => icon.id === iconId);
     if (iconIndex !== -1) {
       mockIconsList.splice(iconIndex, 1);
