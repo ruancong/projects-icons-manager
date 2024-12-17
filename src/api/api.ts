@@ -1,4 +1,4 @@
-import { RollbackIconDTO, UploadIconDTO, CreateProjectDTO } from '~/types/api-dto-types';
+import { RollbackIconDTO, UploadIconDTO, CreateOrUpdateProjectDTO } from '~/types/api-dto-types';
 import { BasePageData, ProjectVO, IconVO, IconHistoryVO } from '~/types/api-vo-types';
 import request from '~/utils/request';
 
@@ -11,6 +11,8 @@ export const API_PATH = {
   ROLLBACK_ICON: '/api/icon/rollback',
   DELETE_ICON: '/api/icon/delete/:iconId',
   CREATE_PROJECT: '/api/project/create',
+  UPDATE_PROJECT: '/api/project/update',
+  DELETE_PROJECT: '/api/project/delete/:projectId',
 };
 
 const queryPageProjects = async (
@@ -64,8 +66,22 @@ const deleteIcon = async (iconId: string) => {
   return request.postWithPathParams(API_PATH.DELETE_ICON, { iconId });
 };
 
-const createProject = async (createProjectDTO: CreateProjectDTO) => {
+const createProject = async (createProjectDTO: CreateOrUpdateProjectDTO) => {
   return request.post(API_PATH.CREATE_PROJECT, createProjectDTO);
+};
+
+/**
+ * 更新项目信息
+ */
+const updateProject = async (dto: CreateOrUpdateProjectDTO) => {
+  return request.post<void>('/api/project/update', dto);
+};
+
+/**
+ * 删除项目
+ */
+const deleteProject = async (projectId: string) => {
+  return request.postWithPathParams<void>(API_PATH.DELETE_PROJECT, { projectId });
 };
 
 export default {
@@ -77,4 +93,6 @@ export default {
   rollbackIcon,
   deleteIcon,
   createProject,
+  updateProject,
+  deleteProject,
 };

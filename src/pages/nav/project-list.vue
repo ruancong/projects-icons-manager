@@ -26,8 +26,16 @@
         <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="name" label="项目名称" />
         <el-table-column prop="rootPath" label="存储根目录" />
-        <el-table-column label="操作" width="200">
+        <el-table-column label="操作">
           <template #default="scope">
+            <el-button size="small" type="primary" @click="handleEdit(scope.row)">
+              <el-icon><Edit /></el-icon>
+              <span>编辑</span>
+            </el-button>
+            <el-button size="small" type="danger" @click="handleDeleteConfirm(scope.row)">
+              <el-icon><Delete /></el-icon>
+              <span>删除</span>
+            </el-button>
             <el-button size="small" type="primary" @click="handleToDetail(scope.row)">
               <span>详情页</span>
               <el-icon><MoreFilled /></el-icon>
@@ -83,6 +91,17 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 删除确认对话框 -->
+    <el-dialog v-model="deleteDialogVisible" title="确认删除" width="30%">
+      <span>确定要删除项目: {{ currentProject?.name }} 吗？此操作不可恢复。</span>
+      <template #footer>
+        <span class="flex justify-end gap-3">
+          <el-button @click="deleteDialogVisible = false">取消</el-button>
+          <el-button type="danger" @click="handleDelete">确定删除</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -94,7 +113,8 @@ import { useRouter } from 'vue-router';
 import { useGlobalMessage } from '~/composables/useGlobalMessage';
 import { ProjectVO } from '~/types/api-vo-types';
 import api from '~/api/api';
-import { MoreFilled } from '@element-plus/icons-vue';
+import { MoreFilled, Edit, Delete } from '@element-plus/icons-vue';
+import { CreateOrUpdateProjectDTO } from '~/types/api-dto-types';
 
 // 1. 接口定义
 interface SearchFormState {
@@ -143,6 +163,10 @@ const formRules: FormRules = {
   ],
 };
 
+// 删除相关
+const deleteDialogVisible = ref(false);
+const currentProject = ref<ProjectVO | null>(null);
+
 // 3. 生命周期方法
 onMounted(() => {
   fetchData();
@@ -153,11 +177,7 @@ onMounted(() => {
 const fetchData = async () => {
   loading.value = true;
 
-  const dataList = await api.queryPageProjects(
-    currentPage.value,
-    pageSize.value,
-    searchForm.name
-  );
+  const dataList = await api.queryPageProjects(currentPage.value, pageSize.value, searchForm.name);
 
   tableData.value = dataList.list;
   total.value = dataList.total;
@@ -208,29 +228,70 @@ const handleToDetail = (row: ProjectVO): void => {
   });
 };
 
-// 弹窗相关方法
-const handleDialogClose = () => {
-  dialogVisible.value = false;
+// 编辑项目
+const handleEdit = (row: ProjectVO): void => {
+  dialogVisible.value = true;
+  dialogTitle.value = '编辑项目';
+  formData.name = row.name;
+  formData.rootPath = row.rootPath;
+  currentProject.value = row;
+  nextTick(() => {
+    formRef.value?.clearValidate();
+  });
 };
 
+// 显示删除确认框
+const handleDeleteConfirm = (row: ProjectVO): void => {
+  currentProject.value = row;
+  deleteDialogVisible.value = true;
+};
+
+// 删除项目
+const handleDelete = async () => {
+  if (!currentProject.value) return;
+
+  try {
+    await api.deleteProject(currentProject.value.id);
+    ElMessage.success('删除成功');
+    deleteDialogVisible.value = false;
+    fetchData();
+  } catch (error) {
+    ElMessage.error('删除失败');
+  }
+};
+
+// 修改提交方法以支持编辑
 const handleSubmit = async () => {
   if (!formRef.value) return;
 
   await formRef.value.validate(async (valid, fields) => {
     if (valid) {
-      const submitData = {
+      const submitData: CreateOrUpdateProjectDTO = {
         name: formData.name,
         rootPath: formData.rootPath,
+        id: currentProject.value?.id,
       };
 
-      await api.createProject(submitData);
+      if (currentProject.value) {
+        await api.updateProject(submitData);
+      } else {
+        await api.createProject(submitData);
+      }
+
       ElMessage.success('保存成功');
       dialogVisible.value = false;
       fetchData();
+      currentProject.value = null;
     } else {
       console.error('表单验证失败:', fields);
     }
   });
+};
+
+// 修改关闭弹窗方法以重置currentProject
+const handleDialogClose = () => {
+  dialogVisible.value = false;
+  currentProject.value = null;
 };
 </script>
 

@@ -10,7 +10,8 @@ export interface RollbackIconDTO {
   version: number;
 }
 
-export interface CreateProjectDTO {
-  name: string;
-  rootPath: string;
+export interface CreateOrUpdateProjectDTO {
+  id?: string;
+  name?: string;
+  rootPath?: string;
 }

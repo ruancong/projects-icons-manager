@@ -3,4 +3,5 @@
  */
 export enum BusinessCodeEnum {
   SUCCESS = 200,
+  FAIL = 500,
 }

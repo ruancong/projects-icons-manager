@@ -4,19 +4,6 @@
     <div my-container>
       <div>
         <h3 class="mb-4 mt-0">项目：{{ projectName }}</h3>
-        <el-button :disabled="true" type="primary" @click="handleEdit">
-          <el-icon><Edit /></el-icon>
-          编辑项目
-        </el-button>
-        <el-button :disabled="true" type="danger" @click="showDeleteConfirm">
-          <el-icon><Delete /></el-icon>
-          删除项目
-        </el-button>
-        <!-- 其他操作按钮 -->
-        <el-button :disabled="true" @click="handleMore">
-          <el-icon><More /></el-icon>
-          更多操作
-        </el-button>
       </div>
     </div>
 
@@ -94,13 +81,13 @@
       </div>
     </div>
 
-    <!-- 删除确认对话框 -->
-    <el-dialog v-model="deleteDialogVisible" title="确认删除" width="30%">
-      <span>确定要删除该项目吗？此操作不可恢复。</span>
+    <!-- 删除 Icon 确认对话框 -->
+    <el-dialog v-model="deleteIconDialogVisible" title="确认删除" width="30%">
+      <span>确定要删除icon: {{ currentDeleteIcon?.name }} 吗？此操作不可恢复。</span>
       <template #footer>
         <span class="flex justify-end gap-3">
-          <el-button @click="deleteDialogVisible = false">取消</el-button>
-          <el-button type="danger" @click="handleDelete">确定删除</el-button>
+          <el-button @click="deleteIconDialogVisible = false">取消</el-button>
+          <el-button type="danger" @click="handleIconDelete">确定删除</el-button>
         </span>
       </template>
     </el-dialog>
@@ -200,17 +187,6 @@
         </span>
       </template>
     </el-dialog>
-
-    <!-- 删除 Icon 确认对话框 -->
-    <el-dialog v-model="deleteIconDialogVisible" title="确认删除" width="30%">
-      <span>确定要删除icon: {{ currentDeleteIcon?.name }} 吗？此操作不可恢复。</span>
-      <template #footer>
-        <span class="flex justify-end gap-3">
-          <el-button @click="deleteIconDialogVisible = false">取消</el-button>
-          <el-button type="danger" @click="handleIconDelete">确定删除</el-button>
-        </span>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -229,27 +205,8 @@ const route = useRoute<'/project/[id]'>();
 const router = useRouter();
 const projectId = route.params.id as string;
 const projectName = history.state.name;
-const deleteDialogVisible = ref(false);
 // 使用 useClipboard hook
 const { copy } = useClipboard();
-
-// 编辑项目
-const handleEdit = () => {
-  router.push(`/project/${projectId}/edit`);
-};
-
-// 显示删除确认框
-const showDeleteConfirm = () => {
-  deleteDialogVisible.value = true;
-};
-
-// 删除项目
-const handleDelete = async () => {};
-
-// 更多操作
-const handleMore = () => {
-  // 实现更多操作的逻辑
-};
 
 const iconList = ref<IconVO[]>([]);
 const currentPage = ref(1);
@@ -352,7 +309,7 @@ const handleIconSubmit = async () => {
     if (valid) {
       submitLoading.value = true;
 
-      // todo 上传文件到oss , 获取ossPath
+      // todo 上传文件��oss , 获取ossPath
       const uploadOssPath = await uploadToOss(iconForm.value.file);
 
       const uploadIconDTO: UploadIconDTO = {

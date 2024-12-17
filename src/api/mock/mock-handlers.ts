@@ -3,7 +3,7 @@ import { BasePageData, BaseResponse, ProjectVO, IconVO, IconHistoryVO } from '~/
 import { API_PATH } from '../api';
 import { BusinessCodeEnum } from '~/utils/constants';
 import getEnv from '~/utils/env';
-import { RollbackIconDTO, UploadIconDTO, CreateProjectDTO } from '~/types/api-dto-types';
+import { RollbackIconDTO, UploadIconDTO, CreateOrUpdateProjectDTO } from '~/types/api-dto-types';
 
 // 随机延迟函数
 const randomDelay = () => delay(500 + Math.random() * 1000);
@@ -52,7 +52,7 @@ export const handlers = [
     // Filter projects by name if search parameter is provided
     let filteredProjects = mockProjectsList;
     if (name) {
-      filteredProjects = mockProjectsList.filter(project => 
+      filteredProjects = mockProjectsList.filter(project =>
         project.name.toLowerCase().includes(name.toLowerCase())
       );
     }
@@ -187,7 +187,7 @@ export const handlers = [
     await randomDelay();
 
     const iconId = params.iconId as string;
-    // 在 mock 数据中查找并删除图标
+    // 在 mock 数据中查找并删除图���
     const iconIndex = mockIconsList.findIndex((icon) => icon.id === iconId);
     if (iconIndex !== -1) {
       mockIconsList.splice(iconIndex, 1);
@@ -204,22 +204,75 @@ export const handlers = [
   http.post(`${BASE_API_URL}${API_PATH.CREATE_PROJECT}`, async ({ request }) => {
     await randomDelay();
 
-    const createProjectDTO = (await request.json()) as CreateProjectDTO;
+    const createProjectDTO = (await request.json()) as CreateOrUpdateProjectDTO;
 
     // 生成新的项目ID
     const newId = (mockProjectsList.length + 1).toString();
-    
+
     // 添加新项目到mock数据中
     mockProjectsList.unshift({
       id: newId,
-      name: createProjectDTO.name,
-      rootPath: createProjectDTO.rootPath,
+      name: createProjectDTO.name || '',
+      rootPath: createProjectDTO.rootPath || '',
     });
 
     return HttpResponse.json<BaseResponse<null>>({
       code: BusinessCodeEnum.SUCCESS,
       data: null,
       msg: 'success',
+    });
+  }),
+
+  // 更新项目的 handler
+  http.post(`${BASE_API_URL}/api/project/update`, async ({ request }) => {
+    await randomDelay();
+
+    const updateProjectDTO = (await request.json()) as CreateOrUpdateProjectDTO;
+    const index = mockProjectsList.findIndex(p => p.id === updateProjectDTO.id);
+
+    if (index === -1) {
+      return HttpResponse.json({
+        code: BusinessCodeEnum.FAIL,
+        msg: '项目不存在',
+        data: null
+      }, { status: 404 });
+    }
+
+    mockProjectsList[index] = {
+      ...mockProjectsList[index],
+      name: updateProjectDTO.name || '',
+      rootPath: updateProjectDTO.rootPath || '',
+    };
+
+    return HttpResponse.json<BaseResponse<null>>({
+      code: BusinessCodeEnum.SUCCESS,
+      data: null,
+      msg: 'success'
+    });
+  }),
+
+  // 删除项目的 handler
+  http.post(`${BASE_API_URL}${API_PATH.DELETE_PROJECT}`, async ({ params }) => {
+    await randomDelay();
+
+    const projectId = params.projectId as string;
+    const index = mockProjectsList.findIndex(p => p.id === projectId);
+
+    if (index === -1) {
+      return HttpResponse.json({
+        code: BusinessCodeEnum.FAIL,
+        msg: '项目不存在',
+        data: null
+      }, { status: 404 });
+    }
+
+    // 从mock数据中删除项目
+    mockProjectsList.splice(index, 1);
+
+    return HttpResponse.json<BaseResponse<null>>({
+      code: BusinessCodeEnum.SUCCESS,
+      data: null,
+      msg: 'success'
     });
   }),
 ];
