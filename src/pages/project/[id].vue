@@ -180,9 +180,11 @@
             class="w-10 h-10"
             fit="contain"
           />
-          <div class="text-xs text-gray-500 mt-1">
-            创建时间: {{ new Date(selectedHistoryIcon.createTime).toLocaleString() }}
-          </div>
+        </el-form-item>
+        <el-form-item label="创建时间:">
+          <span class="text-xs text-gray-500 mt-1">
+            {{ selectedHistoryIcon?.createTime }}
+          </span>
         </el-form-item>
       </el-form>
       <template #footer>
