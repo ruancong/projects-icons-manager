@@ -23,7 +23,7 @@
 
       <!-- 表格区域 -->
       <el-table border v-loading="loading" :data="tableData" class="border w-full">
-        <el-table-column prop="id" label="序号" width="100" />
+        <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="name" label="项目名称" />
         <el-table-column prop="rootPath" label="存储根目录" />
         <el-table-column label="操作" width="200">
@@ -212,14 +212,14 @@ const handleDialogClose = () => {
 const handleSubmit = async () => {
   if (!formRef.value) return;
 
-  await formRef.value.validate((valid, fields) => {
+  await formRef.value.validate(async (valid, fields) => {
     if (valid) {
       const submitData = {
         name: formData.name,
         rootPath: formData.rootPath,
       };
 
-      console.log('提交的数据：', submitData);
+      await api.createProject(submitData);
       ElMessage.success('保存成功');
       dialogVisible.value = false;
       fetchData();

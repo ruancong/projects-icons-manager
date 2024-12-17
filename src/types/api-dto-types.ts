@@ -9,3 +9,8 @@ export interface RollbackIconDTO {
   id: string;
   version: number;
 }
+
+export interface CreateProjectDTO {
+  name: string;
+  rootPath: string;
+}

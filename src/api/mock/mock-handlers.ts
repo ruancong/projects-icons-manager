@@ -3,7 +3,7 @@ import { BasePageData, BaseResponse, ProjectVO, IconVO, IconHistoryVO } from '~/
 import { API_PATH } from '../api';
 import { BusinessCodeEnum } from '~/utils/constants';
 import getEnv from '~/utils/env';
-import { RollbackIconDTO, UploadIconDTO } from '~/types/api-dto-types';
+import { RollbackIconDTO, UploadIconDTO, CreateProjectDTO } from '~/types/api-dto-types';
 
 // 随机延迟函数
 const randomDelay = () => delay(500 + Math.random() * 1000);
@@ -35,7 +35,7 @@ const generateMockIconHistory = (iconId: string): IconHistoryVO[] => {
     // 修改时间格式为 yyyy-MM-dd HH:mm:ss
     createTime: new Date(Date.now() - index * 24 * 60 * 60 * 1000).toISOString().replace(/T/, ' ').replace(/\..+/, ''),
   }));
-  return versions.reverse(); // 返回倒序，最新的在最前
+  return versions.reverse(); // 返回倒���，最新的在最前
 };
 
 const { BASE_API_URL } = getEnv();
@@ -183,6 +183,29 @@ export const handlers = [
     if (iconIndex !== -1) {
       mockIconsList.splice(iconIndex, 1);
     }
+
+    return HttpResponse.json<BaseResponse<null>>({
+      code: BusinessCodeEnum.SUCCESS,
+      data: null,
+      msg: 'success',
+    });
+  }),
+
+  // 创建项目的 handler
+  http.post(`${BASE_API_URL}${API_PATH.CREATE_PROJECT}`, async ({ request }) => {
+    await randomDelay();
+
+    const createProjectDTO = (await request.json()) as CreateProjectDTO;
+
+    // 生成新的项目ID
+    const newId = (mockProjectsList.length + 1).toString();
+    
+    // 添加新项目到mock数据中
+    mockProjectsList.unshift({
+      id: newId,
+      name: createProjectDTO.name,
+      rootPath: createProjectDTO.rootPath,
+    });
 
     return HttpResponse.json<BaseResponse<null>>({
       code: BusinessCodeEnum.SUCCESS,

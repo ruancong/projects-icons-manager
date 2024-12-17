@@ -1,4 +1,4 @@
-import { RollbackIconDTO, UploadIconDTO } from '~/types/api-dto-types';
+import { RollbackIconDTO, UploadIconDTO, CreateProjectDTO } from '~/types/api-dto-types';
 import { BasePageData, ProjectVO, IconVO, IconHistoryVO } from '~/types/api-vo-types';
 import request from '~/utils/request';
 
@@ -10,6 +10,7 @@ export const API_PATH = {
   QUERY_ICON_HISTORY: '/api/icon/:iconId/history',
   ROLLBACK_ICON: '/api/icon/rollback',
   DELETE_ICON: '/api/icon/delete/:iconId',
+  CREATE_PROJECT: '/api/project/create',
 };
 
 const queryPageProjects = async (
@@ -61,6 +62,10 @@ const deleteIcon = async (iconId: string) => {
   return request.postWithPathParams(API_PATH.DELETE_ICON, { iconId });
 };
 
+const createProject = async (createProjectDTO: CreateProjectDTO) => {
+  return request.post(API_PATH.CREATE_PROJECT, createProjectDTO);
+};
+
 export default {
   queryPageProjects,
   queryProjectIcons,
@@ -69,4 +74,5 @@ export default {
   queryIconHistory,
   rollbackIcon,
   deleteIcon,
+  createProject,
 };
