@@ -35,7 +35,7 @@ const generateMockIconHistory = (iconId: string): IconHistoryVO[] => {
     // 修改时间格式为 yyyy-MM-dd HH:mm:ss
     createTime: new Date(Date.now() - index * 24 * 60 * 60 * 1000).toISOString().replace(/T/, ' ').replace(/\..+/, ''),
   }));
-  return versions.reverse(); // 返回倒���，最新的在最前
+  return versions.reverse(); // 返回倒，最新的在最前
 };
 
 const { BASE_API_URL } = getEnv();
@@ -47,17 +47,26 @@ export const handlers = [
     const url = new URL(request.url);
     const page = Number(url.searchParams.get('page')) || 1;
     const pageSize = Number(url.searchParams.get('pageSize')) || 10;
+    const name = url.searchParams.get('name');
+
+    // Filter projects by name if search parameter is provided
+    let filteredProjects = mockProjectsList;
+    if (name) {
+      filteredProjects = mockProjectsList.filter(project => 
+        project.name.toLowerCase().includes(name.toLowerCase())
+      );
+    }
 
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    const data = mockProjectsList.slice(start, end);
+    const data = filteredProjects.slice(start, end);
 
     return HttpResponse.json<BaseResponse<BasePageData<ProjectVO>>>({
       code: BusinessCodeEnum.SUCCESS,
       data: {
         list: data,
-        total: mockProjectsList.length,
-        totalPages: Math.ceil(mockProjectsList.length / pageSize),
+        total: filteredProjects.length,
+        totalPages: Math.ceil(filteredProjects.length / pageSize),
       },
       msg: 'success',
     });

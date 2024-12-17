@@ -7,7 +7,7 @@
           <el-input v-model="searchForm.name" placeholder="请输入项目名称" clearable />
         </el-form-item>
         <el-form-item>
-          <el-button :disabled="true" type="primary" @click="handleSearch">查询</el-button>
+          <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
@@ -153,7 +153,11 @@ onMounted(() => {
 const fetchData = async () => {
   loading.value = true;
 
-  const dataList = await api.queryPageProjects(currentPage.value, pageSize.value);
+  const dataList = await api.queryPageProjects(
+    currentPage.value,
+    pageSize.value,
+    searchForm.name
+  );
 
   tableData.value = dataList.list;
   total.value = dataList.total;

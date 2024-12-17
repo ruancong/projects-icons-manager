@@ -16,10 +16,12 @@ export const API_PATH = {
 const queryPageProjects = async (
   page: number,
   pageSize: number,
+  name?: string,
 ): Promise<BasePageData<ProjectVO>> => {
   const result = await request.get<BasePageData<ProjectVO>>(API_PATH.QUERY_PORJECTS, {
     page,
     pageSize,
+    name,
   });
   return result;
 };
