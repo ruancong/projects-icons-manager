@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { repository } from '~/../package.json';
-
+import { FolderOpened } from '@element-plus/icons-vue';
 </script>
 
 <template>
   <el-menu class="el-menu-demo" mode="horizontal" :ellipsis="false" router>
     <el-menu-item index="/">
       <div class="flex items-center justify-center gap-2">
-        <div class="h-6 w-6 animate-bounce text-green-500" i-ri-arrow-down-circle-fill />
-        <span>Project Icon Management</span>
+        <el-icon color="var(--ep-color-primary)" size="30"><FolderOpened /></el-icon>
+        <span>项目静态资源管理</span>
       </div>
     </el-menu-item>
 
