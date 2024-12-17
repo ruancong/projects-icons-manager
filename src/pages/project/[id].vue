@@ -62,7 +62,12 @@
                 <span>编辑</span>
                 <el-icon><Edit /></el-icon>
               </el-button>
-              <el-button size="small" @click="handleShowHistory(row)">
+              <el-button
+                size="small"
+                @click="handleShowHistory(row)"
+                :loading="historyLoadingId === row.id"
+                :disabled="historyLoadingId === row.id"
+              >
                 <span>历史版本</span>
                 <el-icon><Timer /></el-icon>
               </el-button>
@@ -419,18 +424,23 @@ watch(iconDialogVisible, (newVal) => {
   }
 });
 
-// 显示历史版本弹窗
+// 修改显示历史版本弹窗方法
+const historyLoadingId = ref<string | null>(null);
+
 const handleShowHistory = async (row: IconVO) => {
+  historyLoadingId.value = row.id;
   currentEditIconVO.value = row;
 
   try {
     const historyData = await api.queryIconHistory(row.id);
     iconHistory.value = historyData.sort((a, b) => a.version - b.version);
-    selectedVersion.value = row.version; // 默认选中当前版��
+    selectedVersion.value = row.version;
     historyDialogVisible.value = true;
   } catch (error) {
     console.error('Failed to load icon history:', error);
     ElMessage.error('加载历史版本失败');
+  } finally {
+    historyLoadingId.value = null;
   }
 };
 
